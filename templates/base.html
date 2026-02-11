@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+    <title>Desales Exchange Hub</title>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="nav">
+        <div class="nav-content">
+            <a href="" class="nav-logo">
+                <img src="static/img/DEH logo letras blanco.png" alt="Logo DEH">
+            </a>
+
+            <!-- Barra búsqueda -->
+            <form action="" class="search-form">
+                <input type="text" placeholder="Buscar...">
+            </form>
+            <!-- Botones de navegación -->
+
+            <div class="nav-buttons">
+                <a href="">
+                    <img src="" alt="mail">
+                </a>
+                <a href="">
+                    <img src="" alt="corazon">
+                </a>
+                <a href="">
+                    <img src="" alt="notificaciones">
+                </a>
+                <a href="">
+                    <img src="" alt="user">
+                </a>
+                <a href="" class="upload-button">Upload</a>
+            </div>
+
+        </div>
+    </nav>
+    <!-- Barra lateral -->
+    <div class="sidebar">
+        <ul class="lista-enlaces">
+            <li><a href="#">Libros</a></li>
+            <li><a href="#">Furniture</a></li>
+            <li><a href="#">Bedding</a></li>
+            <li><a href="#">Appliances</a></li>
+            <li><a href="#">Clothes</a></li>
+            <li><a href="#">Sport</a></li>
+            <li><a href="#">Electronics</a></li>
+            <li><a href="#">Others</a></li>
+        </ul>
+    </div> 
+{% block content%}
+        <!-- Contenido de las páginas -->
+{% endblock %}
+</body>
+</html>

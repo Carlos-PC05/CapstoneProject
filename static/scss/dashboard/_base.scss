@@ -1,0 +1,16 @@
+/* Estilos de base.html */
+@use '../base/mixins' as m;
+@use '../base/variables' as v;
+
+.nav-content{
+    background-color: v.$indigo;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .nav-logo{
+        img{
+            width: 30rem;
+        }
+    }
+}
