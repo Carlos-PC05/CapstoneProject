@@ -4,55 +4,75 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     <title>Desales Exchange Hub</title>
 </head>
 <body>
     <!-- Navbar -->
     <nav class="nav">
         <div class="nav-content">
-            <a href="" class="nav-logo">
-                <img src="static/img/DEH logo letras blanco.png" alt="Logo DEH">
+            <a href="/" class="nav-logo">
+                <img src="{{ url_for('static', filename='img/DEH logo letras blanco.png') }}" alt="Desales Exchange Hub Logo">
             </a>
 
             <!-- Barra búsqueda -->
             <form action="" class="search-form">
+                <button type="submit" class="search-btn">
+                    <img src="{{ url_for('static', filename='img/search-white-on-red.svg') }}" alt="Buscar">
+                </button>
                 <input type="text" placeholder="Buscar...">
             </form>
+
             <!-- Botones de navegación -->
-
             <div class="nav-buttons">
-                <a href="">
-                    <img src="" alt="mail">
+                <a href="#" class="nav-icon">
+                    <img src="{{ url_for('static', filename='img/mail.svg') }}" alt="Mensajes">
                 </a>
-                <a href="">
-                    <img src="" alt="corazon">
+                <a href="#" class="nav-icon">
+                    <img src="{{ url_for('static', filename='img/Heart.svg') }}" alt="Favoritos">
                 </a>
-                <a href="">
-                    <img src="" alt="notificaciones">
+                <a href="#" class="nav-icon">
+                    <img src="{{ url_for('static', filename='img/Bell.svg') }}" alt="Notificaciones">
                 </a>
-                <a href="">
-                    <img src="" alt="user">
+                <a href="#" class="nav-icon">
+                    <img src="{{ url_for('static', filename='img/User.svg') }}" alt="Perfil">
                 </a>
-                <a href="" class="upload-button">Upload</a>
+                <a href="#" class="upload-button">Upload</a>
             </div>
-
         </div>
     </nav>
-    <!-- Barra lateral -->
-    <div class="sidebar">
-        <ul class="lista-enlaces">
-            <li><a href="#">Libros</a></li>
-            <li><a href="#">Furniture</a></li>
-            <li><a href="#">Bedding</a></li>
-            <li><a href="#">Appliances</a></li>
-            <li><a href="#">Clothes</a></li>
-            <li><a href="#">Sport</a></li>
-            <li><a href="#">Electronics</a></li>
-            <li><a href="#">Others</a></li>
-        </ul>
-    </div> 
-{% block content%}
-        <!-- Contenido de las páginas -->
-{% endblock %}
+
+    <div class="layout-container">
+        <!-- Barra lateral -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3>All Categories</h3>
+            </div>
+            
+            <div class="scroll-container">
+                <ul class="lista-enlaces" id="categoryList">
+                    <li><a href="#">Books</a></li>
+                    <li><a href="#">Furniture</a></li>
+                    <li><a href="#">Bedding</a></li>
+                    <li><a href="#">Appliances</a></li>
+                    <li><a href="#">Clothes</a></li>
+                    <li><a href="#">Sport</a></li>
+                    <li><a href="#">Electronics</a></li>
+                    <li><a href="#">Others</a></li>
+                </ul>
+                <div class="scroll-progress-track">
+                    <div class="scroll-progress-bar" id="progressBar"></div>
+                </div>
+            </div>
+        </aside> 
+
+        <!-- Contenido principal -->
+        <main class="main-content">
+            {% block content %}
+            {% endblock %}
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
 </html>
