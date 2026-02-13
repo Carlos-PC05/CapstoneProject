@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <!-- Mostrar objeto -->
+
+    <div class="item-contenido">
+        <section class="item-main">
+            <div class="item-imagen-container">
+                <!-- Aquí mostraremos las imagenes del item -->
+                <img class="item-imagen" src="{{ url_for('static', filename=item.image_url) }}" alt="{{ item.name }}">
+            </div>
+        </section>
+        
+        <aside class="item-sidebar">
+            <div class="item-details-card">
+                <div class="item-price-box">
+                    <h2 class="item-price">{{ item.price }} €</h2>
+                    <span class="item-protection-info">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        DeSales protected marketplace
+                    </span>
+                </div>
+                
+                <div class="divider"></div>
+
+                <div class="item-specs">
+                    <div class="spec-row">
+                        <span class="spec-label">Brand</span>
+                        <span class="spec-value action-text">Sin marca</span>
+                    </div>
+                    <div class="spec-row">
+                        <span class="spec-label">Condition</span>
+                        <span class="spec-value action-text">Muy bueno</span>
+                    </div>
+                    <div class="spec-row">
+                        <span class="spec-label">Color</span>
+                        <span class="spec-value action-text">Varios</span>
+                    </div>
+                    <div class="spec-row">
+                        <span class="spec-label">Uploaded</span>
+                        <span class="spec-value">{{ item.created_at.strftime('%Y-%m-%d') }}</span>
+                    </div>
+                </div>
+                
+                <div class="divider"></div>
+
+                <h1 class="item-title">{{ item.name }}</h1>
+                <p class="item-description">{{ item.description }}</p>
+                
+                <div class="divider"></div>
+
+                <div class="item-actions">
+                    <button class="btn btn-primary">Purchase now</button>
+                    <button class="btn btn-outline">Make an offer</button>
+                    <button class="btn btn-outline">Send a message</button>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+{% endblock %}

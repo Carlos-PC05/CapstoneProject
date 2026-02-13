@@ -5,17 +5,34 @@
 
     <div class="contenedor">
         {% for item in items %}
-            <a href="{{ url_for('item_detail', item_id=item.id) }}" class="contenedor-item">
-                <img class="item-imagen" src="{{ url_for('static', filename=item.image_url) }}" alt="{{ item.name }}">
-                <h2 class="item-nombre">{{ item.name }}</h2>
-                <p class="item-descripcion">{{ item.description }}</p>
-                <p class="item-precio">Precio: ${{ item.price }}</p>
-                {% for user in users %}
-                    {% if user.id == item.user_id %}
-                        <p class="item-owner">Propietario: {{ user.username }}</p>
-                    {% endif %}
-                {% endfor %}
-            </a>
+            <div class="contenedor-item">
+                <a href="{{ url_for('item', item_id=item.id) }}" class="item-imagen-container skeleton-loading">
+                    <img class="item-imagen" src="{{ url_for('static', filename=item.image_url) }}" alt="{{ item.name }}" loading="lazy" onload="this.parentElement.classList.remove('skeleton-loading')">
+                    <div class="item-overlay">
+                        <!-- Aquí podríamos poner badges de estado si existieran en el modelo -->
+                    </div>
+                </a>
+                
+                <div class="item-info">
+                    <div class="item-header">
+                        <h2 class="item-nombre">{{ item.name }}</h2>
+                        <div class="item-actions">
+                            <!-- Botón de favorito -->
+                            <button class="action-btn favorite-btn" aria-label="Añadir a favoritos">
+                                <img src="{{ url_for('static', filename='img/Heart.svg') }}" alt="Favorito">
+                                <span class="favorite-count">0</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="item-details">
+                        <p class="item-descripcion">{{ item.description }}</p>
+                        <p class="item-owner">{{ item.owner.username }}</p> <!-- Simplificado para mostrar solo nombre -->
+                    </div>
+                    
+                    <p class="item-precio">{{ item.price }} €</p>
+                </div>
+            </div>
         {% endfor %}
     </div>
 

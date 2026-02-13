@@ -1,54 +1,151 @@
 @use '../base/mixins' as m;
 @use '../base/variables' as v;
 
-/* Darle estilo a los objetos */
+/* Darle estilo a los objetos - Estilo Minimalista Vinted */
 
-.contenedor{
-    @include m.grid(3, 2rem);
+.contenedor {
+    // Grid system de 8px (24px gap = 3 * 8px)
+    display: grid;
+    gap: 1.5rem; // ~24px
+    // Columnas responsivas
+    grid-template-columns: repeat(2, 1fr); // Móvil: 2 columnas
 
+    @include m.tablet {
+        grid-template-columns: repeat(3, 1fr); // Tablet: 3 columnas
+        gap: 2rem;
+    }
 
-    .contenedor-item{
+    @include m.desktop {
+        grid-template-columns: repeat(5, 1fr); // Desktop: 5 columnas (más denso como Vinted)
+    }
+
+    .contenedor-item {
+        position: relative;
+        border: none; // Sin bordes
+        box-shadow: none; // Sin sombras por defecto
+        background: transparent;
+        padding: 0; // Padding eliminado del contenedor principal
         display: flex;
         flex-direction: column;
-        padding: 1rem;
-        border: 1px solid v.$salmon;
-        border-radius: 0.5rem;
-        transition: transform 0.3s ease;
-        text-decoration: none; /* Quitar subrayado del enlace */
-        color: inherit; /* Heredar color de texto para no verse como link azul */
-        cursor: pointer;
-
-        .item-imagen{
+        
+        // Contenedor de Imagen Vertical 3:4 (Ahora es el enlace)
+        .item-imagen-container {
+            position: relative;
+            display: block; // Importante para el anchor
             width: 100%;
-            max-height: 30rem;
-            object-fit: contain;
+            padding-top: 133.33%; // Aspect Ratio 3:4 (height = 4/3 * width)
+            border-radius: 8px; // Esquinas redondeadas
+            overflow: hidden;
+            background-color: #f0f0f0; // Color base para skeleton
+            margin-bottom: 8px; // Separación con el texto
+            transition: filter 0.2s ease;
+            cursor: pointer; // Cursor de mano solo en la imagen
+
+            &:hover {
+                filter: brightness(0.95); // Ligero oscurecimiento al hover
+            }
+
+            // Skeleton loading animation
+            &.skeleton-loading {
+                background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+                background-size: 200% 100%;
+                animation: loading 1.5s infinite;
+            }
+
+            .item-imagen {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                object-fit: cover; // Recorte automático
+                object-position: center;
+                display: block;
+            }
         }
 
-        .item-nombre{
-            font-size: 2rem;
-            font-weight: bold;
-            color: v.$negro; /* Asegurar color negro para el título */
-        }
+        // Información del producto
+        .item-info {
+            display: flex;
+            flex-direction: column;
+            padding: 0 4px; // Pequeño padding lateral si es necesario
 
-        .item-descripcion{
-            font-size: 1.5rem;
-            color: v.$negro;
-        }
+            .item-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                margin-bottom: 4px;
+            }
 
-        .item-precio{
-            font-size: 1.5rem;
-            color: v.$rojo;
-            font-weight: bold;
-        }
+            .item-nombre {
+                font-family: v.$fuente_textos;
+                font-weight: 400; // Peso regular
+                font-size: 1.4rem; // 14px
+                color: #1A1A1A;
+                margin: 0;
+                line-height: 1.4;
+                // Truncar texto largo
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 80%;
+            }
 
-        .item-owner{
-            font-size: 1.5rem;
-            color: v.$azulMarino;
-        }
+            // Acciones (Favorito)
+            .item-actions {
+                .action-btn {
+                    background: none;
+                    border: none;
+                    padding: 0;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    gap: 4px;
+                    transition: transform 0.2s ease;
 
-        &:hover{
-            transform: scale(1.05);
-            background-color: lighten(v.$salmon, 35%); /* Feedback visual sutil */
+                    &:hover {
+                        transform: scale(1.1);
+                    }
+
+                    img {
+                        width: 16px;
+                        height: 16px;
+                        opacity: 0.6; // Outline sutil
+                    }
+
+                    .favorite-count {
+                        font-size: 1.2rem;
+                        color: #757575;
+                    }
+                }
+            }
+
+            .item-details {
+                margin-bottom: 4px;
+                
+                .item-descripcion {
+                    display: none; // Ocultar descripción larga en vista de grid para limpieza
+                }
+
+                .item-owner {
+                    font-size: 1.2rem; // 12px
+                    color: #757575; // Secundario
+                    margin: 0;
+                }
+            }
+
+            .item-precio {
+                font-family: v.$fuente_textos;
+                font-weight: 600; // Semibold
+                font-size: 1.6rem; // 16px
+                color: #1A1A1A;
+                margin: 0;
+            }
         }
     }
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
 }

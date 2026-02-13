@@ -272,7 +272,7 @@ body {
         position: sticky; /* Fijo al hacer scroll */
         top: 80px; /* Debajo del navbar (ajustar según altura real del nav) */
         overflow-y: auto; /* Scroll interno si la lista es muy larga */
-        
+
         // Mostrar header
         .sidebar-header {
             display: flex;

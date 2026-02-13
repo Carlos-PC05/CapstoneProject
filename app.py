@@ -63,9 +63,9 @@ def index():
     return render_template('index.html', items=items, users=users)
 
 @app.route("/item/<int:item_id>")
-def item_detail(item_id):
+def item(item_id):
     item = Item.query.get_or_404(item_id)
-    return render_template('item_detail.html', item=item)
+    return render_template('item.html', item=item)
 
 if __name__ == "__main__":
     with app.app_context():
