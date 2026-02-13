@@ -264,12 +264,14 @@ body {
 @include m.desktop {
     .sidebar {
         width: 250px;
-        height: auto; 
+        height: calc(100vh - 80px); /* Altura fija para el sticky */
         min-height: calc(100vh - 80px); 
         border-bottom: none;
         border-right: 1px solid #ddd;
         padding: 2rem;
-        position: static; 
+        position: sticky; /* Fijo al hacer scroll */
+        top: 80px; /* Debajo del navbar (ajustar según altura real del nav) */
+        overflow-y: auto; /* Scroll interno si la lista es muy larga */
         
         // Mostrar header
         .sidebar-header {

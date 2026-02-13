@@ -1,3 +1,4 @@
+@charset "UTF-8";
 /*! normalize.css v8.0.1 | MIT License | github.com/necolas/normalize.css */
 /* Document
    ========================================================================== */
@@ -632,12 +633,14 @@ body {
 @media (min-width: 1024px) {
   .sidebar {
     width: 250px;
-    height: auto;
+    height: calc(100vh - 80px); /* Altura fija para el sticky */
     min-height: calc(100vh - 80px);
     border-bottom: none;
     border-right: 1px solid #ddd;
     padding: 2rem;
-    position: static;
+    position: sticky; /* Fijo al hacer scroll */
+    top: 80px; /* Debajo del navbar (ajustar según altura real del nav) */
+    overflow-y: auto; /* Scroll interno si la lista es muy larga */
   }
   .sidebar .sidebar-header {
     display: flex;
@@ -686,6 +689,51 @@ body {
   flex-grow: 1;
   padding: 2rem;
   background-color: #f4f4f4;
+}
+
+/* Darle estilo a los objetos */
+.contenedor {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: repeat(3, 1fr);
+}
+.contenedor .contenedor-item {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  border: 1px solid #F15A4F;
+  border-radius: 0.5rem;
+  transition: transform 0.3s ease;
+  text-decoration: none; /* Quitar subrayado del enlace */
+  color: inherit; /* Heredar color de texto para no verse como link azul */
+  cursor: pointer;
+}
+.contenedor .contenedor-item .item-imagen {
+  width: 100%;
+  max-height: 30rem;
+  object-fit: contain;
+}
+.contenedor .contenedor-item .item-nombre {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #000; /* Asegurar color negro para el título */
+}
+.contenedor .contenedor-item .item-descripcion {
+  font-size: 1.5rem;
+  color: #000;
+}
+.contenedor .contenedor-item .item-precio {
+  font-size: 1.5rem;
+  color: #C20F2F;
+  font-weight: bold;
+}
+.contenedor .contenedor-item .item-owner {
+  font-size: 1.5rem;
+  color: #002857;
+}
+.contenedor .contenedor-item:hover {
+  transform: scale(1.05);
+  background-color: rgb(254.1526315789, 245.0131578947, 244.3473684211); /* Feedback visual sutil */
 }
 
 /*# sourceMappingURL=app.css.map */

@@ -1,0 +1,54 @@
+@use '../base/mixins' as m;
+@use '../base/variables' as v;
+
+/* Darle estilo a los objetos */
+
+.contenedor{
+    @include m.grid(3, 2rem);
+
+
+    .contenedor-item{
+        display: flex;
+        flex-direction: column;
+        padding: 1rem;
+        border: 1px solid v.$salmon;
+        border-radius: 0.5rem;
+        transition: transform 0.3s ease;
+        text-decoration: none; /* Quitar subrayado del enlace */
+        color: inherit; /* Heredar color de texto para no verse como link azul */
+        cursor: pointer;
+
+        .item-imagen{
+            width: 100%;
+            max-height: 30rem;
+            object-fit: contain;
+        }
+
+        .item-nombre{
+            font-size: 2rem;
+            font-weight: bold;
+            color: v.$negro; /* Asegurar color negro para el título */
+        }
+
+        .item-descripcion{
+            font-size: 1.5rem;
+            color: v.$negro;
+        }
+
+        .item-precio{
+            font-size: 1.5rem;
+            color: v.$rojo;
+            font-weight: bold;
+        }
+
+        .item-owner{
+            font-size: 1.5rem;
+            color: v.$azulMarino;
+        }
+
+        &:hover{
+            transform: scale(1.05);
+            background-color: lighten(v.$salmon, 35%); /* Feedback visual sutil */
+        }
+    }
+}

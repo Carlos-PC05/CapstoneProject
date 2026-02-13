@@ -1,5 +1,22 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>Welcome to the Index Page</h1>
+    <!-- Mostrar objetos de la base de datos -->
+
+    <div class="contenedor">
+        {% for item in items %}
+            <a href="{{ url_for('item_detail', item_id=item.id) }}" class="contenedor-item">
+                <img class="item-imagen" src="{{ url_for('static', filename=item.image_url) }}" alt="{{ item.name }}">
+                <h2 class="item-nombre">{{ item.name }}</h2>
+                <p class="item-descripcion">{{ item.description }}</p>
+                <p class="item-precio">Precio: ${{ item.price }}</p>
+                {% for user in users %}
+                    {% if user.id == item.user_id %}
+                        <p class="item-owner">Propietario: {{ user.username }}</p>
+                    {% endif %}
+                {% endfor %}
+            </a>
+        {% endfor %}
+    </div>
+
 {% endblock %}
