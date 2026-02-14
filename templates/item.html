@@ -6,16 +6,49 @@
 
     <div class="item-contenido">
         <section class="item-main">
-            <div class="item-imagen-container">
+            <div class="item-detail-image-container">
                 <!-- Aquí mostraremos las imagenes del item -->
-                <img class="item-imagen" src="{{ url_for('static', filename=item.image_url) }}" alt="{{ item.name }}">
+                <img class="item-detail-imagen" src="{{ url_for('static', filename=item.image_url) }}" alt="{{ item.name }}">
+            </div>
+            <div class="divider"></div>
+            <div class="items-similares">
+                <h3 class="sitems-title">Artículos similares</h3>
+                <div class="contenedor">
+                    {% for item in similar_items %}
+                        <div class="contenedor-item">
+                            <a href="{{ url_for('item', item_id=item.id) }}" class="item-imagen-container skeleton-loading">
+                                <img class="item-imagen" src="{{ url_for('static', filename=item.image_url) }}" alt="{{ item.name }}" loading="lazy" onload="this.parentElement.classList.remove('skeleton-loading')">
+                                <div class="item-overlay"></div>
+                            </a>
+                            
+                            <div class="item-info">
+                                <div class="item-header">
+                                    <h2 class="item-nombre">{{ item.name }}</h2>
+                                    <div class="item-actions">
+                                        <button class="action-btn favorite-btn" aria-label="Añadir a favoritos">
+                                            <img src="{{ url_for('static', filename='img/Heart.svg') }}" alt="Favorito">
+                                            <span class="favorite-count">0</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="item-details">
+                                    <p class="item-descripcion">{{ item.description }}</p>
+                                    <p class="item-owner">{{ item.owner.username }}</p>
+                                </div>
+                                
+                                <p class="item-precio">${{ item.price }}</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
         </section>
         
         <aside class="item-sidebar">
             <div class="item-details-card">
                 <div class="item-price-box">
-                    <h2 class="item-price">{{ item.price }} €</h2>
+                    <h2 class="item-price">${{ item.price }}</h2>
                     <span class="item-protection-info">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                         DeSales protected marketplace

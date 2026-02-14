@@ -32,6 +32,13 @@ class Item(db.Model):
     def __repr__(self) -> str:
         return f"<Item {self.name}>"
 
+""" 
+TODO:
+    Para que la base de datos admita que cada objeto pueda tener más de una foto
+    debemos crear una nueva tabla que relacione la clave primaria de cada objeto con 
+    cada una de las fotos que tiene.
+"""
+
 #Seed de ejmplo 
 def seed_data():
     #Verificar que no existen los datos para no duplicar
@@ -64,8 +71,11 @@ def index():
 
 @app.route("/item/<int:item_id>")
 def item(item_id):
+    #Recuperar el item de la base de datos
     item = Item.query.get_or_404(item_id)
-    return render_template('item.html', item=item)
+    #Recuperar los items similares de la base de datos (límite de 10)
+    similar_items = Item.query.filter_by(category=item.category).filter(Item.id != item.id).limit(10).all()
+    return render_template('item.html', item=item, similar_items=similar_items)
 
 if __name__ == "__main__":
     with app.app_context():

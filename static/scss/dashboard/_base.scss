@@ -108,11 +108,12 @@ body {
         border: none;
         outline: none;
         font-family: v.$fuente_textos;
-        font-size: 1rem;
+        font-size: 1.5rem; // Aumentado para mejor accesibilidad (era 1rem)
         border-radius: 0 4px 4px 0;
         
         &::placeholder {
             color: #999;
+            font-size: 1.2rem; // Placeholder ligeramente más pequeño pero legible
         }
     }
 }
@@ -171,7 +172,7 @@ body {
 
 // Sidebar - Versión Móvil y Tablet (Default)
 .sidebar {
-    background-color: v.$blanco;
+    background-color: #ffffff;
     width: 100%; // Ocupar todo el ancho
     padding: 1rem;
     border-bottom: 1px solid #e0e0e0;
@@ -263,56 +264,66 @@ body {
 // Sidebar - Versión Desktop (Override)
 @include m.desktop {
     .sidebar {
-        width: 250px;
+        width: 200px; // Reducido de 250px
         height: calc(100vh - 80px); /* Altura fija para el sticky */
         min-height: calc(100vh - 80px); 
         border-bottom: none;
-        border-right: 1px solid #ddd;
-        padding: 2rem;
+        border-right: 1px solid #f0f0f0; // Borde sutil
+        padding: 2rem 1.5rem;
         position: sticky; /* Fijo al hacer scroll */
-        top: 80px; /* Debajo del navbar (ajustar según altura real del nav) */
-        overflow-y: auto; /* Scroll interno si la lista es muy larga */
+        top: 80px; /* Debajo del navbar */
+        overflow-y: auto; 
+        background-color: #ffffff;
 
-        // Mostrar header
+        // Mostrar header minimalista
         .sidebar-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
             cursor: pointer;
+            padding-left: 0.5rem;
 
             h3 {
                 font-family: v.$fuente_headings;
-                font-weight: 700;
-                color: v.$negro;
-                font-size: 2.5rem;
+                font-weight: 600;
+                color: #999; // Color discreto para título de sección
+                font-size: 0.9rem;
+                text-transform: uppercase;
+                letter-spacing: 1.5px;
             }
         }
 
         // Restaurar lista vertical
         .lista-enlaces {
-            display: block; // Vertical
+            display: flex; // Flex vertical
+            flex-direction: column;
             overflow-x: visible;
             white-space: normal;
-            gap: 0;
+            gap: 0.5rem; // Más espacio entre items
             padding-bottom: 0;
             
             li {
-                margin-bottom: 1rem;
+                margin-bottom: 0;
 
                 &:hover{
-                    background-color: lighten(v.$cian, 30%);
+                    background-color: transparent; // Quitar fondo azul
                 }
 
                 a {
-                    padding: 0.8rem 0;
-                    font-size: 2rem;
+                    padding: 0.75rem 1rem;
+                    font-size: 1.2rem; // Aumentado de 1rem
+                    color: #4a4a4a; // Gris oscuro
                     border-bottom: none;
-                    transition: color 0.3s ease, padding-left 0.3s ease;
+                    border-radius: 6px;
+                    transition: all 0.2s ease;
+                    font-weight: 500;
 
                     &:hover {
-                        padding-left: 0.5rem;
-                        color: v.$rojo;
+                        padding-left: 1rem;
+                        color: v.$negro;
+                        background-color: #f7f7f7; // Fondo muy sutil al hover
+                        transform: translateX(2px);
                     }
                 }
             }
