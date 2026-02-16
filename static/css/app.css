@@ -864,6 +864,7 @@ body {
   background-color: #f5f5f5;
   border-radius: 4px;
   overflow: hidden;
+  position: relative;
 }
 .item-contenido .item-main .item-detail-image-container .item-detail-imagen {
   width: 100%;
@@ -871,6 +872,70 @@ body {
   max-height: 80vh;
   object-fit: contain;
   display: block;
+}
+.item-contenido .item-main .item-detail-image-container .carousel-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+.item-contenido .item-main .item-detail-image-container .carousel-track {
+  display: flex;
+  transition: transform 0.3s ease-in-out;
+  width: 100%;
+}
+.item-contenido .item-main .item-detail-image-container .carousel-slide {
+  min-width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.item-contenido .item-main .item-detail-image-container .carousel-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.3);
+  color: white;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  z-index: 10;
+  font-size: 1.5rem;
+  transition: background 0.2s;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.item-contenido .item-main .item-detail-image-container .carousel-button:hover {
+  background: rgba(0, 0, 0, 0.6);
+}
+.item-contenido .item-main .item-detail-image-container .carousel-button.prev-btn {
+  left: 1rem;
+}
+.item-contenido .item-main .item-detail-image-container .carousel-button.next-btn {
+  right: 1rem;
+}
+.item-contenido .item-main .item-detail-image-container .carousel-indicators {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.5rem;
+  z-index: 10;
+}
+.item-contenido .item-main .item-detail-image-container .carousel-indicators .indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.item-contenido .item-main .item-detail-image-container .carousel-indicators .indicator.active {
+  background: white;
 }
 .item-contenido .item-main .items-similares {
   margin-top: 3rem;
