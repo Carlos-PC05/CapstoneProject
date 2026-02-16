@@ -1,0 +1,134 @@
+* {
+  box-sizing: border-box;
+}
+
+.login2 {
+  display: flex;
+  position: relative;
+  align-items: flex-start;
+  justify-content: space-between;
+  background: #002857;
+  padding: 349px 336px 272px 345px;
+  width: 1440px;
+  height: 1024px;
+  overflow: hidden;
+
+  .autoWrapper2 {
+    position: absolute;
+    top: 68px;
+    left: 355px;
+    width: 731px;
+    height: 860px;
+
+    .rectangle10 {
+      display: flex;
+      position: absolute;
+      top: 27px;
+      left: 0;
+      flex-direction: column;
+      align-items: flex-start;
+      padding-bottom: 62px;
+      width: 731px;
+      height: 833px;
+      background-image: url(../image/mlp8wtvn-cu3zgzf.svg);
+      background-position: center;
+      background-size: cover;
+      background-repeat: no-repeat;
+
+      .dEhLogo {
+        width: 731px;
+        height: 286px;
+      }
+
+      .email {
+        margin-top: 23px;
+        margin-left: 102px;
+        width: 64px;
+        height: 17px;
+      }
+
+      .rectangle11 {
+        margin-top: 25px;
+        margin-left: 95px;
+        border-radius: 30px;
+        background: #69c3e840;
+        width: 541px;
+        height: 66px;
+      }
+
+      .password {
+        margin-top: 51px;
+        margin-left: 102px;
+        width: 111px;
+        height: 17px;
+      }
+
+      .rectangle13 {
+        display: flex;
+        align-items: flex-start;
+        align-self: stretch;
+        margin: 49px 276px 0px;
+        border-radius: 30px;
+        background: #002857cc;
+        padding: 24px 64px 20px 55px;
+
+        .login {
+          width: 60px;
+          height: 22px;
+        }
+      }
+
+      .autoWrapper {
+        display: flex;
+        align-items: center;
+        align-self: stretch;
+        justify-content: space-between;
+        margin-top: 46px;
+        padding-right: 96px;
+        padding-left: 96px;
+
+        .donTYouHaveAnAccount {
+          width: 143px;
+          height: 34px;
+        }
+
+        .recoverPassword {
+          width: 141px;
+          height: 12px;
+        }
+      }
+    }
+
+    .bloopMobileHomeEvent {
+      position: absolute;
+      top: 0;
+      left: 444px;
+      width: 24px;
+      height: 55px;
+      overflow: hidden;
+    }
+  }
+
+  .autoWrapper3 {
+    display: flex;
+    position: relative;
+    align-items: flex-start;
+    align-self: stretch;
+
+    .bloopMobileHomeNewsB {
+      margin-top: 317px;
+      width: 35px;
+      height: 86px;
+      overflow: hidden;
+      rotate: 122deg;
+    }
+
+    .bloopMobileHomeNewsB2 {
+      margin-left: 688px;
+      width: 35px;
+      height: 86px;
+      overflow: hidden;
+      rotate: 40deg;
+    }
+  }
+}

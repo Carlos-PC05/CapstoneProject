@@ -16,10 +16,12 @@ instance/
 *.sqlite3
 
 # Node / Frontend
+node_modules
 node_modules/
 npm-debug.log
 .sass-cache/
 *.css.map
+package-lock.json
 
 # OS
 .DS_Store
