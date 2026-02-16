@@ -1013,4 +1013,212 @@ body {
   color: #757575;
 }
 
+/* Estilos del login */
+.login-page {
+  background-color: #002857;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  position: relative;
+  overflow: hidden;
+}
+@media (min-width: 768px) {
+  .login-page {
+    padding: 2rem;
+  }
+}
+.login-page .bg-decoration {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  opacity: 0.5;
+}
+@media (min-width: 768px) {
+  .login-page .bg-decoration {
+    width: 100px;
+    height: 100px;
+  }
+}
+.login-page .bg-decoration.top-left {
+  top: 2%;
+  left: 2%;
+  width: 12rem;
+}
+@media (min-width: 768px) {
+  .login-page .bg-decoration.top-left {
+    top: 5%;
+    left: 5%;
+    width: 20rem;
+  }
+}
+.login-page .bg-decoration.bottom-right {
+  bottom: 2%;
+  right: 2%;
+}
+@media (min-width: 768px) {
+  .login-page .bg-decoration.bottom-right {
+    bottom: 5%;
+    right: 5%;
+  }
+}
+
+.login-card {
+  background-color: #ffffff;
+  width: 100%;
+  max-width: 100%;
+  border-radius: 16px;
+  padding: 2rem 1.5rem;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+}
+@media (min-width: 768px) {
+  .login-card {
+    max-width: 500px;
+    border-radius: 20px;
+    padding: 3rem 4rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    margin: 1rem;
+  }
+}
+.login-card .logo-container {
+  margin-bottom: 2rem;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+@media (min-width: 768px) {
+  .login-card .logo-container {
+    margin-bottom: 3rem;
+  }
+}
+.login-card .logo-container .login-logo {
+  max-width: 180px;
+  height: auto;
+}
+@media (min-width: 768px) {
+  .login-card .logo-container .login-logo {
+    max-width: 250px;
+  }
+}
+.login-card .login-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+@media (min-width: 768px) {
+  .login-card .login-form {
+    gap: 1.5rem;
+  }
+}
+.login-card .login-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.login-card .login-form .form-group label {
+  font-family: "Work Sans", sans-serif;
+  font-weight: 700;
+  color: #000;
+  font-size: 1.3rem;
+  margin-left: 0.5rem;
+}
+@media (min-width: 768px) {
+  .login-card .login-form .form-group label {
+    font-size: 1.2rem;
+    margin-left: 1rem;
+  }
+}
+.login-card .login-form .form-group .form-input {
+  background-color: rgba(105, 195, 232, 0.25);
+  border: none;
+  border-radius: 25px;
+  height: 45px;
+  padding: 0 1.5rem;
+  font-family: "Work Sans", sans-serif;
+  font-size: 1.2rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+@media (min-width: 768px) {
+  .login-card .login-form .form-group .form-input {
+    height: 50px;
+    font-size: 1.2rem;
+  }
+}
+.login-card .login-form .form-group .form-input::placeholder {
+  color: rgba(0, 0, 0, 0.5);
+}
+.login-card .login-form .form-group .form-input:focus {
+  outline: 2px solid #002857;
+  background-color: rgba(105, 195, 232, 0.1);
+}
+.login-card .login-form .form-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+  width: 100%;
+}
+.login-card .login-form .form-actions .login-btn {
+  background-color: #2F456A;
+  color: white;
+  padding: 0.8rem 0;
+  border-radius: 25px;
+  text-decoration: none;
+  font-family: "Work Sans", sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: background-color 0.3s;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+  display: block;
+}
+@media (min-width: 768px) {
+  .login-card .login-form .form-actions .login-btn {
+    width: auto;
+    padding: 0.8rem 4rem;
+    font-size: 1.1rem;
+  }
+}
+.login-card .login-form .form-actions .login-btn:hover {
+  background-color: #002857;
+}
+.login-card .login-form .form-footer {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  font-size: 1rem;
+  text-align: center;
+}
+@media (min-width: 768px) {
+  .login-card .login-form .form-footer {
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: 0.9rem;
+  }
+}
+.login-card .login-form .form-footer a {
+  color: #000;
+  text-decoration: underline;
+  font-family: "Work Sans", sans-serif;
+}
+.login-card .login-form .form-footer a:hover {
+  color: #002857;
+}
+.login-card .login-form .form-footer .signup-text {
+  font-family: "Work Sans", sans-serif;
+}
+
 /*# sourceMappingURL=app.css.map */

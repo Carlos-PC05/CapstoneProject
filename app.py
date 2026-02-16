@@ -5,7 +5,8 @@ from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 
-#Database
+""" Database """
+
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
 db = SQLAlchemy(app)
 
@@ -62,8 +63,24 @@ def seed_data():
     db.session.add_all([item1, item2, item3, item4]) #Añadimos a la base de datos a estos items
     db.session.commit() #ejecutamos la transacción
 
+""" Auth """
+
 @app.route("/")
-def index():
+def login():
+    return render_template('auth/login.html')
+
+@app.route("/auth/signup")
+def signup():
+    return render_template('auth/SignUp.html')
+
+@app.route("/auth/recover")
+def recover():
+    return render_template('auth/Recover.html')
+
+""" Dashboard """
+
+@app.route("/dashboard")
+def dashboard():
     #Recuperar todos los items de la base de datos
     items = Item.query.all()
     users = User.query.all()
