@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
 
 db = SQLAlchemy()
 
@@ -6,11 +7,18 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     username = db.Column(db.String(20), unique = True, nullable = False)
     email = db.Column(db.String(120), unique = True, nullable = False)
-    password = db.Column(db.String(60), nullable = False)
+    password = db.Column(db.String(255), nullable = False)
+    is_active = db.Column(db.Boolean, default=False, nullable=False)
     items = db.relationship('Item', backref = 'owner', lazy = True)
 
     def __repr__(self) -> str:
         return f"<User {self.username}>"
+
+    def set_password(self, password):
+        self.password = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password, password)
 
 class Item(db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement = True)
@@ -18,7 +26,6 @@ class Item(db.Model):
     description = db.Column(db.String(400), nullable = False)
     price = db.Column(db.Float, nullable = False)
     category = db.Column(db.String(20), nullable = False)
-    # image_url removed in favor of ItemImage table
     created_at = db.Column(db.DateTime, nullable = False, default = db.func.current_timestamp())
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = False)
     images = db.relationship('ItemImage', backref='item', lazy=True)

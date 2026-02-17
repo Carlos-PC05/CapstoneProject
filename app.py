@@ -1,14 +1,29 @@
 import os
-from unicodedata import category
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 from models import db, User, Item, ItemImage
+from utils import mail, generate_confirmation_token, confirm_token, send_email
+from dotenv import load_dotenv
+
+# Cargar variables de entorno desde el archivo .env
+load_dotenv()
 
 app = Flask(__name__)
+app.secret_key = os.getenv("SECRET_KEY", "default_secret_key") # Fallback en caso de que no exista
+app.config['SECURITY_PASSWORD_SALT'] = os.getenv("SECURITY_PASSWORD_SALT", "default_salt")
+
+# Mail Configuration
+app.config['MAIL_SERVER'] = os.getenv("MAIL_SERVER", 'smtp.googlemail.com')
+app.config['MAIL_PORT'] = int(os.getenv("MAIL_PORT", 587))
+app.config['MAIL_USE_TLS'] = os.getenv("MAIL_USE_TLS", "True") == "True"
+app.config['MAIL_USERNAME'] = os.getenv("MAIL_USERNAME")
+app.config['MAIL_PASSWORD'] = os.getenv("MAIL_PASSWORD")
+app.config['MAIL_DEFAULT_SENDER'] = os.getenv("MAIL_DEFAULT_SENDER")
 
 """ Database """
 
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("SQLALCHEMY_DATABASE_URI", "sqlite:///database.db")
 db.init_app(app)
+mail.init_app(app)
 
 #Seed de ejmplo 
 def seed_data():
@@ -17,9 +32,14 @@ def seed_data():
         return;
 
     #Crear Usuarios
-    user1 = User(username="Carlos", email="carlosparracamacho@gmail.com", password="Saltador2005_", items=[])
-    user2 = User(username="Juan", email="juanperez@gmail.com", password="Juan1234_", items=[])  #creamos las instancias de los usuarios
-    user3 = User(username="Ana", email="anagomez@gmail.com", password="Ana1234_", items=[])
+    user1 = User(username="Carlos", email="carlosparracamacho@gmail.com", is_active=True, items=[])
+    user1.set_password("Saltador2005_")
+    
+    user2 = User(username="Juan", email="juanperez@gmail.com", is_active=True, items=[])  #creamos las instancias de los usuarios
+    user2.set_password("Juan1234_")
+    
+    user3 = User(username="Ana", email="anagomez@gmail.com", is_active=True, items=[])
+    user3.set_password("Ana1234_")
 
     db.session.add_all([user1, user2, user3]) #Añadimos a la base de datos a estos usuarios
     db.session.commit() #ejecutamos la transacción
@@ -47,14 +67,105 @@ def seed_data():
 
 """ Auth """
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 def login():
+    if request.method == "POST":
+        #Obtenemos el email y la contraseña del formulario
+        email = request.form.get("email")
+        password = request.form.get("password")
+
+        #Buscamos el usuario en la base de datos por su email
+        user = User.query.filter_by(email=email).first()
+
+        #Si el usuario no está, cargamos la página de login con un mensaje de error (debemos imprimir alertas y darle estilo)
+        if not user:
+            return render_template('auth/login.html', error="Email no registrado")
+
+        #Si el usuario está, verificamos la contraseña
+        if user and user.check_password(password):
+            #La contraseña es correcta
+
+            # Verificar si el usuario está activo
+            if not user.is_active:
+                return render_template('auth/login.html', error="Por favor, confirma tu cuenta primero. Revisa tu email.")
+
+            #Guardamos el username en la sesión y redirigimos al dashboard
+            session["username"] = user.username
+            return redirect(url_for("dashboard"))
+        else:
+            #Si la contraseña es incorrecta, cargamos la página de login con un mensaje de error (debemos imprimir alertas y darle estilo)
+            return render_template('auth/login.html', error="Contraseña incorrecta")
+            
+    # GET request
+    if "username" in session:
+        return redirect(url_for("dashboard"))
     return render_template('auth/login.html')
 
-@app.route("/auth/signup")
+#Registro de usuarios
+@app.route("/auth/signup", methods=["GET", "POST"])
 def signup():
+    if request.method == "POST":
+        username = request.form.get("name")
+        email = request.form.get("email")
+        password = request.form.get("password")
+        password2 = request.form.get("password2")
+        if password != password2:
+            return render_template('auth/SignUp.html', error="Las contraseñas no coinciden")
+        else:
+            #Verificar si el usuario ya está registrado
+            user = User.query.filter_by(email=email).first()
+            if user:
+                #ya está registrado
+                return render_template('auth/login.html', error = "Email ya registrado")
+            else:
+                #No está registrado, crear usuario inactivo
+                newUser = User(username=username, email=email, is_active=False)
+                newUser.set_password(password)
+                db.session.add(newUser)
+                db.session.commit()
+                
+                # Generar token y enviar email
+                token = generate_confirmation_token(newUser.email)
+                confirm_url = url_for('confirm_email', token=token, _external=True)
+                html = render_template('auth/confirm_email_template.html', confirm_url=confirm_url)
+                subject = "Por favor confirma tu correo electrónico"
+                
+                try:
+                    send_email(newUser.email, subject, html)
+                except Exception as e:
+                    print(f"Error enviando email: {e}")
+                    # En desarrollo, imprimimos el link en consola
+                    print(f"LINK DE CONFIRMACION (DEV): {confirm_url}")
+                
+                return redirect(url_for("confirm"))
+
+    # GET request
     return render_template('auth/SignUp.html')
 
+#Confirmar correo electrónico
+@app.route('/auth/confirm/<token>')
+def confirm_email(token):
+    try:
+        email = confirm_token(token)
+    except:
+        return render_template('auth/login.html', error="El enlace de confirmación es inválido o ha expirado.")
+        
+    user = User.query.filter_by(email=email).first_or_404()
+    
+    if user.is_active:
+        return render_template('auth/login.html', error="Cuenta ya confirmada. Por favor inicia sesión.")
+    
+    user.is_active = True
+    db.session.add(user)
+    db.session.commit()
+    
+    return render_template('auth/activated.html')
+
+@app.route("/auth/confirm_info")
+def confirm():
+    return render_template('auth/confirm.html')
+
+#Recuperar contraseña
 @app.route("/auth/recover")
 def recover():
     return render_template('auth/Recover.html')

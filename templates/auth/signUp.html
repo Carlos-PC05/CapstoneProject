@@ -23,7 +23,13 @@
                 <img src="{{ url_for('static', filename='img/DEH_logo.svg') }}" alt="DeSales Exchange Hub Logo" class="login-logo">
             </div>
 
-            <form class="login-form">
+            {% if error %}
+                <div class="error-container">
+                    <p class="error-message">{{ error }}</p>
+                </div>
+            {% endif %}
+
+            <form class="login-form" action="{{ url_for('signup') }}" method="POST">
                 <div class="form-group">
                     <label for="name">Full Name</label>
                     <input type="text" id="name" name="name" class="form-input" placeholder="Enter your full name">
@@ -45,7 +51,7 @@
                 </div>
 
                 <div class="form-actions">
-                    <a href="{{ url_for('login') }}" class="login-btn">Sign Up</a>
+                    <button type="submit" class="login-btn">Sign Up</button>
                 </div>
 
                 <div class="form-footer">
