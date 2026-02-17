@@ -8,7 +8,34 @@
         <section class="item-main">
             <div class="item-detail-image-container">
                 <!-- Aquí mostraremos las imagenes del item -->
-                <img class="item-detail-imagen" src="{{ url_for('static', filename=item.image_url) }}" alt="{{ item.name }}">
+                {% if item.images and item.images|length > 0 %}
+                <!-- Si tiene imágenes -->
+                    <div class="carousel-container">
+                        <div class="carousel-track">
+                            {% for image in item.images %}
+                                <div class="carousel-slide">
+                                    <img class="item-detail-imagen" src="{{ url_for('static', filename=image.image_url) }}" alt="{{ item.name }} - Image {{ loop.index }}">
+                                </div>
+                            {% endfor %}
+                        </div>
+                        
+                        {% if item.images|length > 1 %}
+                        <!-- Si tiene más de una imagen, crea el carrusel -->
+                            <button class="carousel-button prev-btn" aria-label="Previous Image">&#10094;</button>
+                            <button class="carousel-button next-btn" aria-label="Next Image">&#10095;</button>
+                            
+                            <div class="carousel-indicators">
+                                {% for image in item.images %}
+                                    <span class="indicator {% if loop.first %}active{% endif %}" data-slide="{{ loop.index0 }}"></span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                <!--    Este else no tiene sentido porque será obligatorio que tenga imágenes  
+                {% else %}
+                    <img class="item-detail-imagen" src="{{ url_for('static', filename=item.image_url) }}" alt="{{ item.name }}">
+                {% endif %} 
+                -->
             </div>
             <div class="divider"></div>
             <div class="items-similares">

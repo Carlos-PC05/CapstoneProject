@@ -1,44 +1,14 @@
 import os
 from unicodedata import category
 from flask import Flask, render_template, request
-from flask_sqlalchemy import SQLAlchemy
+from models import db, User, Item, ItemImage
 
 app = Flask(__name__)
 
 """ Database """
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
-db = SQLAlchemy(app)
-
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key = True)
-    username = db.Column(db.String(20), unique = True, nullable = False)
-    email = db.Column(db.String(120), unique = True, nullable = False)
-    password = db.Column(db.String(60), nullable = False)
-    items = db.relationship('Item', backref = 'owner', lazy = True)
-
-    def __repr__(self) -> str:
-        return f"<User {self.username}>"
-
-class Item(db.Model):
-    id = db.Column(db.Integer, primary_key = True, autoincrement = True)
-    name = db.Column(db.String(50), nullable = False)
-    description = db.Column(db.String(400), nullable = False)
-    price = db.Column(db.Float, nullable = False)
-    category = db.Column(db.String(20), nullable = False)
-    image_url = db.Column(db.String(200), nullable = False)
-    created_at = db.Column(db.DateTime, nullable = False, default = db.func.current_timestamp())
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = False)
-
-    def __repr__(self) -> str:
-        return f"<Item {self.name}>"
-
-""" 
-TODO:
-    Para que la base de datos admita que cada objeto pueda tener más de una foto
-    debemos crear una nueva tabla que relacione la clave primaria de cada objeto con 
-    cada una de las fotos que tiene.
-"""
+db.init_app(app)
 
 #Seed de ejmplo 
 def seed_data():
@@ -55,13 +25,25 @@ def seed_data():
     db.session.commit() #ejecutamos la transacción
 
     #Crear Items
-    item1 = Item(name="Taza", description="Taza de ceramica", price=10.0, category="Hogar", image_url="img/items/taza.jpg", user_id=user1.id)
-    item2 = Item(name="Lampara", description="Lampara LED", price=20.0, category="Hogar", image_url="img/items/lampara.jpg", user_id=user2.id)
-    item3 = Item(name="Mesa", description="Mesa de madera", price=30.0, category="Hogar", image_url="img/items/mesa.jpg", user_id=user3.id)
-    item4 = Item(name="Silla", description="Silla de plástico", price=40.0, category="Hogar", image_url="img/items/silla.jpg", user_id=user1.id)
+    item1 = Item(name="Taza", description="Taza de ceramica", price=10.0, category="Hogar", images=[], user_id=user1.id)
+    item2 = Item(name="Lampara", description="Lampara LED", price=20.0, category="Hogar", images=[], user_id=user2.id)
+    item3 = Item(name="Mesa", description="Mesa de madera", price=30.0, category="Hogar", images=[], user_id=user3.id)
+    item4 = Item(name="Silla", description="Silla de plástico", price=40.0, category="Hogar", images=[], user_id=user1.id)
 
     db.session.add_all([item1, item2, item3, item4]) #Añadimos a la base de datos a estos items
     db.session.commit() #ejecutamos la transacción
+
+    # Add images
+    img1 = ItemImage(image_url="img/items/taza.jpg", item=item1)
+    img2 = ItemImage(image_url="img/items/lampara.jpg", item=item2)
+    img3 = ItemImage(image_url="img/items/mesa.jpg", item=item3)
+    img4 = ItemImage(image_url="img/items/silla.jpg", item=item4)
+    img5 = ItemImage(image_url="img/items/taza2.jpg", item=item1)
+    img6 = ItemImage(image_url="img/items/taza3.jpg", item=item1)
+    img7 = ItemImage(image_url="img/items/taza4.jpg", item=item1)
+    
+    db.session.add_all([img1, img2, img3, img4, img5, img6, img7])
+    db.session.commit()
 
 """ Auth """
 
