@@ -1142,6 +1142,7 @@ body {
   flex-direction: column;
   align-items: center;
   margin: 0;
+  text-align: center;
 }
 @media (min-width: 768px) {
   .login-card {
@@ -1285,6 +1286,11 @@ body {
 .login-card .login-form .form-footer .signup-text {
   font-family: "Work Sans", sans-serif;
 }
+.login-card .texto-confirm {
+  font-family: "Work Sans", sans-serif;
+  font-size: 1.2rem;
+  color: #757575;
+}
 
 .error-container {
   margin-bottom: 2rem;
@@ -1296,6 +1302,21 @@ body {
   justify-content: center;
 }
 .error-container .error-message {
+  color: #e0e0e0;
+  font-family: "Work Sans", sans-serif;
+  font-size: 1.2rem;
+}
+
+.success-container {
+  margin-bottom: 2rem;
+  background-color: #28A745;
+  padding: 0.5rem 1rem;
+  border-radius: 25px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+.success-container .success-message {
   color: #e0e0e0;
   font-family: "Work Sans", sans-serif;
   font-size: 1.2rem;

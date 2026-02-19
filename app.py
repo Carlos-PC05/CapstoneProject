@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session
 from models import db, User, Item, ItemImage
 from utils import mail, generate_confirmation_token, confirm_token, send_email
 from dotenv import load_dotenv
@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
+
 app.secret_key = os.getenv("SECRET_KEY", "default_secret_key") # Fallback en caso de que no exista
 app.config['SECURITY_PASSWORD_SALT'] = os.getenv("SECURITY_PASSWORD_SALT", "default_salt")
 
@@ -15,6 +16,7 @@ app.config['SECURITY_PASSWORD_SALT'] = os.getenv("SECURITY_PASSWORD_SALT", "defa
 app.config['MAIL_SERVER'] = os.getenv("MAIL_SERVER", 'smtp.googlemail.com')
 app.config['MAIL_PORT'] = int(os.getenv("MAIL_PORT", 587))
 app.config['MAIL_USE_TLS'] = os.getenv("MAIL_USE_TLS", "True") == "True"
+app.config['MAIL_USE_SSL'] = False
 app.config['MAIL_USERNAME'] = os.getenv("MAIL_USERNAME")
 app.config['MAIL_PASSWORD'] = os.getenv("MAIL_PASSWORD")
 app.config['MAIL_DEFAULT_SENDER'] = os.getenv("MAIL_DEFAULT_SENDER")
@@ -79,7 +81,7 @@ def login():
 
         #Si el usuario no está, cargamos la página de login con un mensaje de error (debemos imprimir alertas y darle estilo)
         if not user:
-            return render_template('auth/login.html', error="Email no registrado")
+            return render_template('auth/login.html', error="Email not registered.")
 
         #Si el usuario está, verificamos la contraseña
         if user and user.check_password(password):
@@ -87,14 +89,14 @@ def login():
 
             # Verificar si el usuario está activo
             if not user.is_active:
-                return render_template('auth/login.html', error="Por favor, confirma tu cuenta primero. Revisa tu email.")
+                return render_template('auth/login.html', error="Please confirm your account first. Check your email.")
 
             #Guardamos el username en la sesión y redirigimos al dashboard
             session["username"] = user.username
             return redirect(url_for("dashboard"))
         else:
             #Si la contraseña es incorrecta, cargamos la página de login con un mensaje de error (debemos imprimir alertas y darle estilo)
-            return render_template('auth/login.html', error="Contraseña incorrecta")
+            return render_template('auth/login.html', error="Incorrect password.")
             
     # GET request
     if "username" in session:
@@ -109,14 +111,16 @@ def signup():
         email = request.form.get("email")
         password = request.form.get("password")
         password2 = request.form.get("password2")
+        if len(password) < 8:
+            return render_template('auth/SignUp.html', error="The password must be at least 8 characters long.")
         if password != password2:
-            return render_template('auth/SignUp.html', error="Las contraseñas no coinciden")
+            return render_template('auth/SignUp.html', error="Passwords don't match.")
         else:
             #Verificar si el usuario ya está registrado
             user = User.query.filter_by(email=email).first()
             if user:
                 #ya está registrado
-                return render_template('auth/login.html', error = "Email ya registrado")
+                return render_template('auth/login.html', error = "Email already registered.")
             else:
                 #No está registrado, crear usuario inactivo
                 newUser = User(username=username, email=email, is_active=False)
@@ -128,13 +132,13 @@ def signup():
                 token = generate_confirmation_token(newUser.email)
                 confirm_url = url_for('confirm_email', token=token, _external=True)
                 html = render_template('auth/confirm_email_template.html', confirm_url=confirm_url)
-                subject = "Por favor confirma tu correo electrónico"
+                subject = "Please confirm your email address"
                 
                 try:
                     send_email(newUser.email, subject, html)
                 except Exception as e:
-                    print(f"Error enviando email: {e}")
-                    # En desarrollo, imprimimos el link en consola
+                    print(f"Error sending email: {e}")
+                    # In development, print the link in console
                     print(f"LINK DE CONFIRMACION (DEV): {confirm_url}")
                 
                 return redirect(url_for("confirm"))
@@ -148,12 +152,12 @@ def confirm_email(token):
     try:
         email = confirm_token(token)
     except:
-        return render_template('auth/login.html', error="El enlace de confirmación es inválido o ha expirado.")
+        return render_template('auth/login.html', error="The confirmation link is invalid or has expired.")
         
     user = User.query.filter_by(email=email).first_or_404()
     
     if user.is_active:
-        return render_template('auth/login.html', error="Cuenta ya confirmada. Por favor inicia sesión.")
+        return render_template('auth/login.html', error="Account already confirmed. Please log in.")
     
     user.is_active = True
     db.session.add(user)
@@ -166,9 +170,59 @@ def confirm():
     return render_template('auth/confirm.html')
 
 #Recuperar contraseña
-@app.route("/auth/recover")
+@app.route("/auth/recover", methods=["GET", "POST"])
 def recover():
-    return render_template('auth/Recover.html')
+    if request.method == "POST":
+        email = request.form.get("email")
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            return render_template('auth/recover.html', error="Email not registered.")
+        
+        # Generar token y enviar email
+        token = generate_confirmation_token(user.email)
+        recover_url = url_for('recover_password', token=token, _external=True)
+        html = render_template('auth/recover_password_template.html', recover_url=recover_url)
+        subject = "Password recovery"
+        try:
+            send_email(user.email, subject, html)
+        except Exception as e:
+            print(f"Error sending email: {e}")
+            # In development, print the link in console
+            print(f"LINK DE RECOVERY (DEV): {recover_url}")
+            
+        return render_template('auth/confirm.html')
+    
+    # GET request
+    return render_template('auth/recover.html')
+
+#Restaurar contraseña
+@app.route("/auth/restore/<token>", methods=["GET", "POST"])
+def recover_password(token):
+    try:
+        email = confirm_token(token)
+    except:
+        return render_template('auth/login.html', error="The recovery link is invalid or has expired.")
+    
+    if request.method == "POST":
+        password = request.form.get("password")
+        password_confirm = request.form.get("password_confirm")
+
+        if len(password) < 8:
+            return render_template('auth/restore.html', token=token, error="The password must be at least 8 characters long.")
+        
+        if not password or not password_confirm:
+             return render_template('auth/restore.html', token=token, error="Please fill in all fields")
+
+        if password != password_confirm:
+            return render_template('auth/restore.html', token=token, error="Passwords do not match")
+            
+        user = User.query.filter_by(email=email).first_or_404()
+        user.set_password(password)
+        db.session.commit()
+        
+        return render_template('auth/login.html', success="Password updated successfully. Please login.")
+        
+    return render_template('auth/restore.html', token=token)
 
 """ Dashboard """
 

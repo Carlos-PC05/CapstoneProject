@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - DeSales Exchange Hub</title>
+    <title>Restore Password - DeSales Exchange Hub</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
@@ -19,42 +19,32 @@
 
         <div class="login-card">
             <div class="logo-container">
-                <!-- Usaremos el logo que mejor se adapte, asumo desales-logo-color.svg por el fondo blanco -->
                 <img src="{{ url_for('static', filename='img/DEH_logo.svg') }}" alt="DeSales Exchange Hub Logo" class="login-logo">
             </div>
 
-            <!-- Alertas de error -->
             {% if error %}
                 <div class="error-container">
                     <p class="error-message">{{ error }}</p>
                 </div>
-            {% endif %} 
+            {% endif %}
 
-            <!-- Alertas de éxito -->
-            {% if success %}
-                <div class="success-container">
-                    <p class="success-message">{{ success }}</p>
-                </div>
-            {% endif %} 
-
-            <form class="login-form" action="{{ url_for('login') }}" method="POST">
+            <form class="login-form" action="{{ url_for('recover_password', token=token) }}" method="POST">
                 <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" class="form-input" placeholder="Enter your email">
+                    <label for="password">New Password</label>
+                    <input type="password" id="password" name="password" class="form-input" placeholder="Enter your new password" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" class="form-input" placeholder="Enter your password">
+                    <label for="password_confirm">Confirm Password</label>
+                    <input type="password" id="password_confirm" name="password_confirm" class="form-input" placeholder="Confirm your new password" required>
                 </div>
 
                 <div class="form-actions">
-                    <button type="submit" class="login-btn">Login</button>
+                    <button type="submit" class="login-btn">Update Password</button>
                 </div>
 
                 <div class="form-footer">
-                    <span class="signup-text">Don't you have an account? <a href="{{ url_for('signup') }}" class="signup-link">Sign up</a></span>
-                    <a href="{{ url_for('recover') }}" class="recover-link">Recover Password</a>
+                    <a href="{{ url_for('login') }}" class="recover-link">Back to Login</a>
                 </div>
             </form>
         </div>

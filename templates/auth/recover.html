@@ -23,6 +23,12 @@
                 <img src="{{ url_for('static', filename='img/DEH_logo.svg') }}" alt="DeSales Exchange Hub Logo" class="login-logo">
             </div>
 
+            {% if error %}
+                <div class="error-container">
+                    <p class="error-message">{{ error }}</p>
+                </div>
+            {% endif %}
+
             <form class="login-form" action="{{ url_for('recover') }}" method="POST">
                 <div class="form-group">
                     <label for="email">Email</label>
@@ -30,7 +36,7 @@
                 </div>
 
                 <div class="form-actions">
-                    <a href="{{ url_for('login') }}" class="login-btn">Recover Password</a>
+                    <button type="submit" class="login-btn">Recover Password</button>
                 </div>
 
                 <div class="form-footer">
