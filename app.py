@@ -2,6 +2,7 @@ import os
 from flask import Flask, render_template, request, redirect, url_for, session
 from models import db, User, Item, ItemImage
 from utils import mail, generate_confirmation_token, confirm_token, send_email
+from extensions import huey
 from dotenv import load_dotenv
 
 # Cargar variables de entorno desde el archivo .env
