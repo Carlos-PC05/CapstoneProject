@@ -35,13 +35,13 @@ def seed_data():
         return;
 
     #Crear Usuarios
-    user1 = User(username="Carlos", email="carlosparracamacho@gmail.com", is_active=True, items=[])
+    user1 = User(username="Carlos", email="carlosparracamacho@gmail.com", is_active=True, items=[], country="España", city="Huércal-Overa", description="Hola, soy Carlos.")
     user1.set_password("Saltador2005_")
     
-    user2 = User(username="Juan", email="juanperez@gmail.com", is_active=True, items=[])  #creamos las instancias de los usuarios
+    user2 = User(username="Juan", email="juanperez@gmail.com", is_active=True, items=[], country="España", city="Madrid", description="Hola, soy Juan.")  #creamos las instancias de los usuarios
     user2.set_password("Juan1234_")
     
-    user3 = User(username="Ana", email="anagomez@gmail.com", is_active=True, items=[])
+    user3 = User(username="Ana", email="anagomez@gmail.com", is_active=True, items=[], country="España", city="Madrid", description="Hola, soy Ana.")
     user3.set_password("Ana1234_")
 
     db.session.add_all([user1, user2, user3]) #Añadimos a la base de datos a estos usuarios
