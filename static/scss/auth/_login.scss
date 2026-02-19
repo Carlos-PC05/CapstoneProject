@@ -197,11 +197,11 @@
                 flex-direction: row;
                 justify-content: space-between;
                 gap: 1rem;
-                font-size: 0.9rem;
+                font-size: 1.2rem;
             }
 
             a {
-                color: #000;
+                color: v.$azulMarino;
                 text-decoration: underline;
                 font-family: v.$fuente_textos;
                 
@@ -214,5 +214,22 @@
                 font-family: v.$fuente_textos;
             }
         }
+    }
+}
+
+.error-container {
+    margin-bottom: 2rem;
+    background-color: v.$rojo;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+
+    width: 100%;
+    display: flex;
+    justify-content: center;
+
+    .error-message {
+        color: v.$blanco;
+        font-family: v.$fuente_textos;
+        font-size: 1.2rem;
     }
 }

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Activated - DeSales Exchange Hub</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="login-page">
+        <!-- Decoraciones de fondo -->
+        <div class="bg-decoration top-left">
+            <img src="{{ url_for('static', filename='img/muchasHojas.svg') }}" alt="muchas hojas">
+        </div>
+        <div class="bg-decoration bottom-right">
+            <img src="{{ url_for('static', filename='img/3hojas.svg') }}" alt="2 hojas">
+        </div>
+
+        <div class="login-card">
+            <div class="logo-container">
+                <img src="{{ url_for('static', filename='img/DEH_logo.svg') }}" alt="DeSales Exchange Hub Logo" class="login-logo">
+            </div>
+
+            <div class="success-container" style="text-align: center; padding: 20px;">
+                <h2 style="color: #28a745; margin-bottom: 15px;">Account Activated!</h2>
+                <p class="texto-confirm">
+                    Your account has been successfully confirmed. You can now log in to access all features.
+                </p>
+                
+                <div class="form-actions" style="margin-top: 25px;">
+                    <a href="{{ url_for('login') }}" class="login-btn" style="text-decoration: none; display: inline-block; text-align: center;">Go to Login</a>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</body>
+</html>
