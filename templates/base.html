@@ -12,13 +12,13 @@
     <nav class="nav">
         <div class="nav-content">
             <a href="/dashboard" class="nav-logo">
-                <img src="{{ url_for('static', filename='img/DEH logo letras blanco.png') }}" alt="Desales Exchange Hub Logo">
+                <img src="{{ url_for('static', filename='img/assets/DEH logo letras blanco.png') }}" alt="Desales Exchange Hub Logo">
             </a>
 
             <!-- Barra búsqueda -->
             <form action="" class="search-form">
                 <button type="submit" class="search-btn">
-                    <img src="{{ url_for('static', filename='img/search-white-on-red.svg') }}" alt="Buscar">
+                    <img src="{{ url_for('static', filename='img/assets/search-white-on-red.svg') }}" alt="Buscar">
                 </button>
                 <input type="text" placeholder="Buscar...">
             </form>
@@ -26,16 +26,16 @@
             <!-- Botones de navegación -->
             <div class="nav-buttons">
                 <a href="#" class="nav-icon">
-                    <img src="{{ url_for('static', filename='img/mail.svg') }}" alt="Mensajes">
+                    <img src="{{ url_for('static', filename='img/assets/mail.svg') }}" alt="Mensajes">
                 </a>
                 <a href="#" class="nav-icon">
-                    <img src="{{ url_for('static', filename='img/Heart.svg') }}" alt="Favoritos">
+                    <img src="{{ url_for('static', filename='img/assets/Heart.svg') }}" alt="Favoritos">
                 </a>
                 <a href="#" class="nav-icon">
-                    <img src="{{ url_for('static', filename='img/Bell.svg') }}" alt="Notificaciones">
+                    <img src="{{ url_for('static', filename='img/assets/Bell.svg') }}" alt="Notificaciones">
                 </a>
-                <a href="#" class="nav-icon">
-                    <img src="{{ url_for('static', filename='img/User.svg') }}" alt="Perfil">
+                <a href="{{ url_for('profile') }}" class="nav-icon">
+                    <img src="{{ url_for('static', filename='img/assets/User.svg') }}" alt="Perfil">
                 </a>
                 <a href="#" class="upload-button">Upload</a>
             </div>

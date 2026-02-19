@@ -28,6 +28,29 @@ app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("SQLALCHEMY_DATABASE_URI", "sq
 db.init_app(app)
 mail.init_app(app)
 
+
+def get_current_user_from_session():
+    user_id = session.get("user_id")
+    if user_id is not None:
+        user = db.session.get(User, user_id)
+        if user:
+            # Keep username during migration period for legacy usages.
+            session["user_id"] = user.id
+            session["username"] = user.username
+            return user
+
+    legacy_username = session.get("username")
+    if legacy_username and user_id is None:
+        user = User.query.filter_by(username=legacy_username).first()
+        if user:
+            session["user_id"] = user.id
+            session["username"] = user.username
+            return user
+
+    session.pop("user_id", None)
+    session.pop("username", None)
+    return None
+
 #Seed de ejmplo 
 def seed_data():
     #Verificar que no existen los datos para no duplicar
@@ -35,13 +58,13 @@ def seed_data():
         return;
 
     #Crear Usuarios
-    user1 = User(username="Carlos", email="carlosparracamacho@gmail.com", is_active=True, items=[], country="España", city="Huércal-Overa", description="Hola, soy Carlos.")
+    user1 = User(username="Carlos", email="carlosparracamacho@gmail.com", is_active=True, items=[], country="España", city="Huércal-Overa", description="Hola, soy Carlos.", photo_url="img/users/fotoNYSkyline.jpeg")
     user1.set_password("Saltador2005_")
     
-    user2 = User(username="Juan", email="juanperez@gmail.com", is_active=True, items=[], country="España", city="Madrid", description="Hola, soy Juan.")  #creamos las instancias de los usuarios
+    user2 = User(username="Juan", email="juanperez@gmail.com", is_active=True, items=[], country="España", city="Madrid", description="Hola, soy Juan.", photo_url = "")  #creamos las instancias de los usuarios
     user2.set_password("Juan1234_")
     
-    user3 = User(username="Ana", email="anagomez@gmail.com", is_active=True, items=[], country="España", city="Madrid", description="Hola, soy Ana.")
+    user3 = User(username="Ana", email="anagomez@gmail.com", is_active=True, items=[], country="España", city="Madrid", description="Hola, soy Ana.", photo_url = "")
     user3.set_password("Ana1234_")
 
     db.session.add_all([user1, user2, user3]) #Añadimos a la base de datos a estos usuarios
@@ -92,7 +115,8 @@ def login():
             if not user.is_active:
                 return render_template('auth/login.html', error="Please confirm your account first. Check your email.")
 
-            #Guardamos el username en la sesión y redirigimos al dashboard
+            # Guardamos user_id como clave principal de sesion.
+            session["user_id"] = user.id
             session["username"] = user.username
             return redirect(url_for("dashboard"))
         else:
@@ -100,9 +124,15 @@ def login():
             return render_template('auth/login.html', error="Incorrect password.")
             
     # GET request
-    if "username" in session:
+    if get_current_user_from_session():
         return redirect(url_for("dashboard"))
     return render_template('auth/login.html')
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("login"))
+
 
 #Registro de usuarios
 @app.route("/auth/signup", methods=["GET", "POST"])
@@ -224,6 +254,24 @@ def recover_password(token):
         return render_template('auth/login.html', success="Password updated successfully. Please login.")
         
     return render_template('auth/restore.html', token=token)
+
+""" User Profile """
+
+@app.route("/profile")
+def profile():
+    user = get_current_user_from_session()
+    if not user:
+        return redirect(url_for("login"))
+
+    return render_template('user/profile.html', user=user)
+
+@app.route("/user/edit")
+def edit_profile():
+    user = get_current_user_from_session()
+    if not user:
+        return redirect(url_for("login"))
+
+    return render_template('user/editProfile.html')
 
 """ Dashboard """
 

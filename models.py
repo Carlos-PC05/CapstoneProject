@@ -13,6 +13,7 @@ class User(db.Model):
     country = db.Column(db.String(20), nullable = True, default = "")
     city = db.Column(db.String(20), nullable = True, default = "")
     description = db.Column(db.String(400), nullable = True, default = "")
+    photo_url = db.Column(db.String(200), nullable = True, default = "")
 
     def __repr__(self) -> str:
         return f"<User {self.username}>"
