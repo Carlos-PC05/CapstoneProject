@@ -65,6 +65,7 @@
     flex-direction: column;
     align-items: center;
     margin: 0; 
+    text-align: center;
 
     // Tablet y superior (Desktop style)
     @include m.tablet {
@@ -215,6 +216,12 @@
             }
         }
     }
+
+    .texto-confirm{
+        font-family: v.$fuente_textos;
+        font-size: 1.2rem;
+        color: v.$gris;
+    }
 }
 
 .error-container {
@@ -228,6 +235,23 @@
     justify-content: center;
 
     .error-message {
+        color: v.$blanco;
+        font-family: v.$fuente_textos;
+        font-size: 1.2rem;
+    }
+}
+
+.success-container {
+    margin-bottom: 2rem;
+    background-color: v.$verde;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+
+    width: 100%;
+    display: flex;
+    justify-content: center;
+
+    .success-message {
         color: v.$blanco;
         font-family: v.$fuente_textos;
         font-size: 1.2rem;
