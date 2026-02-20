@@ -1,15 +1,92 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="auth-container">
-    <div class="login-page">
-        <div class="login-card">
-            <h2>Edit Profile</h2>
-            <p>This page is under construction.</p>
-            <div class="form-actions">
-                <a href="{{ url_for('profile') }}" class="login-btn">Back to Profile</a>
+<div class="edit-profile-page">
+    <!-- Aquí obtienes los mensajes de flash y los imprime en pantalla -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="profile-details-section">
+        <h2 class="section-title">Profile Details</h2>
+        
+        <div class="settings-group">
+            <!-- Foto de perfil -->
+            <form id="photo-form" action="{{ url_for('edit_profile') }}" method="POST" enctype="multipart/form-data" class="setting-item photo-item" style="width: 100%; box-sizing: border-box;">
+                <span class="setting-label">Your Photo</span>
+                <div class="setting-action">
+                    <div class="profile-photo-preview">
+                        {% if user.photo_url %}
+                            <img src="{{ url_for('static', filename=user.photo_url) }}" alt="{{ user.username }}" class="profile-avatar">
+                        {% else %}
+                            <div class="profile-avatar-placeholder">
+                                {{ user.username[0].upper() }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <input type="file" name="photo" id="photo-input" style="display: none;" accept="image/*">
+                    <button type="button" class="action-btn" onclick="document.getElementById('photo-input').click()">Choose photo</button>
+                </div>
+            </form>
+
+            <!-- Username -->
+            <form class="setting-item" method="POST" action="{{ url_for('edit_profile') }}">
+                <span class="setting-label">Username</span>
+                <input type="text" name="username" class="setting-value input" value="{{ user.username }}">
+                <button type="submit" class="action-btn">Change Username</button>
+            </form>
+
+            <!-- About You -->
+            <form class="setting-item description-item" method="POST" action="{{ url_for('edit_profile') }}">
+                <span class="setting-label">About You</span>
+                <textarea name="description" class="setting-value input description-input">{{ user.description }}</textarea>
+                <button type="submit" class="action-btn">Edit Description</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="location-section">
+        <h2 class="section-title">My Location</h2>
+        
+        <div class="settings-group">
+            <!-- Country -->
+            <div class="setting-item">
+                <span class="setting-label">Country</span>
+                <div class="dropdown-display">
+                    <span>United States</span>
+                    <img src="{{ url_for('static', filename='img/assets/down-arrow-white.svg') }}" alt="arrow" class="arrow-icon">
+                </div>
+            </div>
+
+            <!-- Town/City -->
+            <div class="setting-item">
+                <span class="setting-label">Town/City</span>
+                <div class="dropdown-display">
+                    <span>Center Valley, PA</span>
+                    <img src="{{ url_for('static', filename='img/assets/down-arrow-white.svg') }}" alt="arrow" class="arrow-icon">
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <span class="setting-label"></span>
+                <div class="save-changes-btn-container">
+                    <button class="save-changes-btn">Save changes</button>
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- Return Button -->
+    <div class="return-button-container">
+        <button class="return-button" data-url="{{ url_for('profile') }}">Go back to Profile</button>
+    </div>
+
 </div>
+
 {% endblock %}

@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const categoryList = document.getElementById('categoryList');
     const progressBar = document.getElementById('progressBar');
     const track = document.querySelector('.scroll-progress-track');
+    const returnButton = document.querySelector('.return-button');
 
     function updateProgress() {
         if (!categoryList) return;
@@ -104,5 +105,25 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateCarousel();
             }
         }
+    }
+
+    // Profile Photo Upload Logic
+    const photoInput = document.getElementById('photo-input');
+    if (photoInput) {
+        photoInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                document.getElementById('photo-form').submit();
+            }
+        });
+    }
+
+    // Return Button Logic
+    if (returnButton) {
+        returnButton.addEventListener('click', () => {
+            const url = returnButton.dataset.url;
+            if (url) {
+                window.location.href = url;
+            }
+        });
     }
 });

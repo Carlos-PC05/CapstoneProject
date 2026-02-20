@@ -19,7 +19,7 @@
             
             <div class="profile-about">
                 <h3>About:</h3>
-                <p>{{ user.description if user.description else "No description provided." }}</p>
+                <p>{{ user.description if user.description else "" }}</p>
             </div>
         </div>
         
@@ -32,7 +32,6 @@
 
     <div class="profile-tabs">
         <div class="tab active">Listing</div>
-        <div class="tab">Reviews</div>
     </div>
     
     <div class="profile-separator"></div>
@@ -49,7 +48,7 @@
                         <h2 class="item-nombre">{{ item.name }}</h2>
                         <div class="item-actions">
                             <button class="action-btn favorite-btn" aria-label="Añadir a favoritos">
-                                <img src="{{ url_for('static', filename='img/Heart.svg') }}" alt="Favorito">
+                                <img src="{{ url_for('static', filename='img/assets/Heart.svg') }}" alt="Favorito">
                                 <span class="favorite-count">0</span>
                             </button>
                         </div>

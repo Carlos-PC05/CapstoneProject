@@ -1,8 +1,9 @@
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer
 from flask import current_app, url_for
-from extensions import huey
-import copy
+from huey import SqliteHuey
+
+huey = SqliteHuey(filename='instance/huey.db')
 
 mail = Mail()
 
