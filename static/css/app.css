@@ -1717,4 +1717,259 @@ body {
   background-color: rgb(146.6602870813, 11.3397129187, 35.5311004785);
 }
 
+.upload-page {
+  padding: 2rem 4rem;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.upload-page .page-title {
+  font-family: "Work Sans", sans-serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  color: #010101;
+}
+.upload-page .alert {
+  margin-bottom: 20px;
+  padding: 15px;
+  border-radius: 5px;
+  font-family: "Work Sans", sans-serif;
+}
+.upload-page .alert.alert-success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+.upload-page .alert.alert-error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+.upload-page .upload-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.upload-page .upload-form .form-section {
+  background-color: #D9D9D9;
+  border-radius: 4px;
+  padding: 0;
+  overflow: hidden;
+}
+.upload-page .upload-form .form-section.photo-upload-section {
+  min-height: 320px;
+  height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f3f4f6;
+  border: 1px dashed #c5c8cf;
+  padding: 1.5rem 2rem;
+}
+.upload-page .upload-form .form-section.photo-upload-section .upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  min-height: 280px;
+}
+.upload-page .upload-form .form-section.photo-upload-section .upload-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  text-align: center;
+  transition: transform 0.25s ease;
+}
+.upload-page .upload-form .form-section.photo-upload-section .btn-select-photos {
+  background-color: #e0e0e0;
+  color: #1f2937;
+  border: 1px solid #d0d5dd;
+  padding: 0.85rem 2.3rem;
+  font-family: "Work Sans", sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 6px 20px rgba(16, 24, 40, 0.08);
+}
+.upload-page .upload-form .form-section.photo-upload-section .btn-select-photos:hover {
+  background-color: #f9fafb;
+  border-color: #b8bec9;
+}
+.upload-page .upload-form .form-section.photo-upload-section .upload-hint,
+.upload-page .upload-form .form-section.photo-upload-section .upload-count {
+  margin-bottom: 0;
+  text-align: center;
+  font-family: "Work Sans", sans-serif;
+  color: #667085;
+  font-size: 0.95rem;
+}
+.upload-page .upload-form .form-section.photo-upload-section .upload-drop-hint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #98a2b3;
+  letter-spacing: 0.01em;
+}
+.upload-page .upload-form .form-section.photo-upload-section .preview-shell {
+  width: 100%;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.35s ease, opacity 0.25s ease;
+}
+.upload-page .upload-form .form-section.photo-upload-section .preview-shell.is-visible {
+  max-height: 220px;
+  opacity: 1;
+}
+.upload-page .upload-form .form-section.photo-upload-section .image-preview-container {
+  display: flex;
+  gap: 0.9rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.25rem 0.2rem 0.4rem;
+  scroll-snap-type: x proximity;
+}
+.upload-page .upload-form .form-section.photo-upload-section .preview-item {
+  position: relative;
+  width: 132px;
+  min-width: 132px;
+  height: 132px;
+  scroll-snap-align: start;
+}
+.upload-page .upload-form .form-section.photo-upload-section .preview-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 10px;
+  border: 1px solid #d0d5dd;
+  background-color: #fff;
+  padding: 0.3rem;
+}
+.upload-page .upload-form .form-section.photo-upload-section .preview-remove-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: rgba(1, 1, 1, 0.75);
+  color: #e0e0e0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+}
+.upload-page .upload-form .form-section.photo-upload-section .preview-remove-btn svg {
+  width: 15px;
+  height: 15px;
+  fill: currentColor;
+}
+.upload-page .upload-form .form-section.photo-upload-section .preview-remove-btn:hover {
+  background: #C20F2F;
+}
+.upload-page .upload-form .form-section.photo-upload-section.has-photos {
+  align-items: flex-start;
+}
+.upload-page .upload-form .form-section.photo-upload-section.has-photos .upload-placeholder {
+  justify-content: flex-start;
+  align-items: stretch;
+  min-height: auto;
+}
+.upload-page .upload-form .form-section.photo-upload-section.has-photos .upload-controls {
+  transform: translateY(2px);
+}
+.upload-page .upload-form .form-section.photo-upload-section.is-dragover {
+  border-color: #C20F2F;
+  background-color: #eef4ff;
+}
+.upload-page .upload-form .form-section.info-section, .upload-page .upload-form .form-section.category-section, .upload-page .upload-form .form-section.price-section {
+  padding: 1.5rem 2rem;
+}
+.upload-page .upload-form .form-section .form-group {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 1rem 0;
+}
+.upload-page .upload-form .form-section .form-group .form-label {
+  font-family: "Work Sans", sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  width: 200px;
+  color: #010101;
+  padding-top: 0.5rem;
+}
+.upload-page .upload-form .form-section .form-group .form-input {
+  flex-grow: 1;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #898989;
+  font-family: "Work Sans", sans-serif;
+  font-size: 1rem;
+  padding: 0.5rem 0;
+  color: #010101;
+}
+.upload-page .upload-form .form-section .form-group .form-input:focus {
+  outline: none;
+  border-bottom-color: #010101;
+}
+.upload-page .upload-form .form-section .form-group .form-input::placeholder {
+  color: #666;
+  font-style: italic;
+}
+.upload-page .upload-form .form-section .form-group textarea.form-input {
+  resize: vertical;
+  min-height: 80px;
+}
+.upload-page .upload-form .form-section .form-group select.form-input {
+  cursor: pointer;
+  appearance: none;
+}
+.upload-page .upload-form .form-section .form-divider {
+  height: 1px;
+  background-color: #898989;
+  width: 100%;
+  margin: 0.5rem 0;
+}
+.upload-page .upload-form .form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.upload-page .upload-form .form-actions button {
+  padding: 0.8rem 2rem;
+  font-family: "Work Sans", sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.upload-page .upload-form .form-actions .btn-draft {
+  background-color: #fff;
+  border: 1px solid #C20F2F;
+  color: #010101;
+  color: #010101;
+}
+.upload-page .upload-form .form-actions .btn-draft:hover {
+  background-color: #f0f0f0;
+}
+.upload-page .upload-form .form-actions .btn-upload {
+  background-color: #C20F2F;
+  border: 1px solid #C20F2F;
+  color: #e0e0e0;
+}
+.upload-page .upload-form .form-actions .btn-upload:hover {
+  background-color: rgb(146.6602870813, 11.3397129187, 35.5311004785);
+}
+
 /*# sourceMappingURL=app.css.map */

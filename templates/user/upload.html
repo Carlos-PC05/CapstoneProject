@@ -1,15 +1,81 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="auth-container">
-    <div class="login-page">
-        <div class="login-card">
-            <h2>Upload Item</h2>
-            <p>This page is under construction.</p>
-            <div class="form-actions">
-                <a href="{{ url_for('profile') }}" class="login-btn">Back to Profile</a>
+<div class="upload-page">
+    <h1 class="page-title">Upload an Item</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form class="upload-form" action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
+        
+        <!-- Upload Photos Section -->
+        <div class="form-section photo-upload-section">
+            <div class="upload-placeholder">
+                <div class="upload-controls">
+                    <button type="button" class="btn-select-photos">Upload Photos</button>
+                    <input type="file" name="photos" id="photos" accept="image/*" multiple hidden>
+                    <p class="upload-hint">You can upload up to 6 photos</p>
+                    <p class="upload-drop-hint">or drag and drop images here</p>
+                    <p id="photo-count" class="upload-count"></p>
+                </div>
             </div>
         </div>
-    </div>
+
+        <!-- Title & Description Section -->
+        <div class="form-section info-section">
+            <div class="form-group">
+                <label for="title" class="form-label">Title</label>
+                <input type="text" id="title" name="title" class="form-input" placeholder="What are you uploading?">
+            </div>
+            <div class="form-divider"></div>
+            <div class="form-group">
+                <label for="description" class="form-label">Description</label>
+                <textarea id="description" name="description" class="form-input" placeholder="Tell us more about it" rows="4"></textarea>
+            </div>
+        </div>
+
+        <!-- Category Section -->
+        <div class="form-section category-section">
+            <div class="form-group">
+                <label for="category" class="form-label">Category</label>
+                <div class="select-wrapper">
+                    <select id="category" name="category" class="form-input">
+                        <option value="" disabled selected>Select a Category</option>
+                        <option value="Books">Books</option>
+                        <option value="Furniture">Furniture</option>
+                        <option value="Bedding">Bedding</option>
+                        <option value="Appliances">Appliances</option>
+                        <option value="Clothes">Clothes</option>
+                        <option value="Sport">Sport</option>
+                        <option value="Electronics">Electronics</option>
+                        <option value="Others">Others</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Price Section -->
+        <div class="form-section price-section">
+            <div class="form-group">
+                <label for="price" class="form-label">Price</label>
+                <input type="number" id="price" name="price" class="form-input" placeholder="$0.00" step="0.01" min="0">
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="form-actions">
+            <button type="button" class="btn-draft">Save as Draft</button>
+            <button type="submit" class="btn-upload">Upload</button>
+        </div>
+    </form>
 </div>
+
 {% endblock %}

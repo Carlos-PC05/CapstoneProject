@@ -165,7 +165,7 @@ def signup():
             user = User.query.filter_by(email=email).first()
             if user:
                 #ya está registrado
-                return render_template('auth/login.html', error = "Email already registered.")
+                return render_template('auth/SignUp.html', error = "Email already registered.")
             else:
                 #No está registrado, crear usuario inactivo
                 newUser = User(username=username, email=email, is_active=False)
@@ -360,11 +360,80 @@ def edit_profile():
 
 
 """ Upload Item """
-@app.route("/user/upload")
+@app.route("/user/upload", methods=["GET", "POST"])
 def upload():
     user = get_current_user_from_session()
     if not user:
-        return redirect(url_for("login"))
+        return redirect(url_for("login"))    
+
+    if request.method == "POST":
+        title = request.form.get("title")
+        description = request.form.get("description")
+        category = request.form.get("category")
+        price = request.form.get("price")
+
+        if not title or not description or not category or not price:
+             flash('Please fill in all required fields', 'error')
+             return redirect(request.url)
+        
+        try:
+            price = float(price)
+        except ValueError:
+            flash('Invalid price', 'error')
+            return redirect(request.url)
+
+        # Handle photos
+        if 'photos' in request.files:
+            files = request.files.getlist('photos')
+            
+            # Check if at least one file is selected (and not empty)
+            if not files or files[0].filename == '':
+                flash('At least one photo is required', 'error')
+                return redirect(request.url)
+
+            # Limit to 6 photos
+            if len(files) > 6:
+                flash('Maximum 6 photos allowed. Please select fewer photos.', 'error')
+                return redirect(request.url)
+
+            # Create Item only if validation passes
+            new_item = Item(name=title, description=description, price=price, category=category, user_id=user.id)
+            db.session.add(new_item)
+            db.session.commit() # Commit to get ID
+
+            #Gestionar cada foto
+            for file in files:
+                if file and file.filename != '' and allowed_file(file.filename):
+                    filename = secure_filename(file.filename)
+                    
+                    # Calculate hash
+                    file_content = file.read()
+                    file_hash = hashlib.sha256(file_content).hexdigest()
+                    file.seek(0)
+                    
+                    file_ext = os.path.splitext(filename)[1].lower()
+                    unique_filename = f"{file_hash}{file_ext}"
+                    
+                    relative_path = os.path.join('img', 'items', unique_filename)
+                    full_path = os.path.join(app.root_path, 'static', relative_path)
+                    
+                    if not os.path.exists(full_path):
+                        os.makedirs(os.path.dirname(full_path), exist_ok=True)
+                        file.save(full_path)
+                    
+                    # Create ItemImage
+                    new_image = ItemImage(image_url=f"img/items/{unique_filename}", item_id=new_item.id)
+                    db.session.add(new_image)
+            
+            db.session.commit()
+            flash('Item uploaded successfully!', 'success')
+            return redirect(url_for('dashboard')) # Redirect to dashboard or item page
+        
+        else:
+             # Item created without photos
+             flash('At least one photo is required', 'error')
+             return redirect(request.url)
+
 
     return render_template('user/upload.html')
 
