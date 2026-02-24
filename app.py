@@ -1,8 +1,9 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, session
+import hashlib
+from flask import Flask, render_template, request, redirect, url_for, session, flash
+from werkzeug.utils import secure_filename
 from models import db, User, Item, ItemImage
 from utils import mail, generate_confirmation_token, confirm_token, send_email
-from extensions import huey
 from dotenv import load_dotenv
 
 # Cargar variables de entorno desde el archivo .env
@@ -21,6 +22,13 @@ app.config['MAIL_USE_SSL'] = False
 app.config['MAIL_USERNAME'] = os.getenv("MAIL_USERNAME")
 app.config['MAIL_PASSWORD'] = os.getenv("MAIL_PASSWORD")
 app.config['MAIL_DEFAULT_SENDER'] = os.getenv("MAIL_DEFAULT_SENDER")
+
+# File Upload Configuration
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 """ Database """
 
@@ -91,8 +99,14 @@ def seed_data():
     db.session.add_all([img1, img2, img3, img4, img5, img6, img7])
     db.session.commit()
 
-""" Auth """
+""" 
+----------------
+    Rutas
+----------------
+"""
 
+
+""" Auth """
 @app.route("/", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -151,7 +165,7 @@ def signup():
             user = User.query.filter_by(email=email).first()
             if user:
                 #ya está registrado
-                return render_template('auth/login.html', error = "Email already registered.")
+                return render_template('auth/SignUp.html', error = "Email already registered.")
             else:
                 #No está registrado, crear usuario inactivo
                 newUser = User(username=username, email=email, is_active=False)
@@ -256,7 +270,6 @@ def recover_password(token):
     return render_template('auth/restore.html', token=token)
 
 """ User Profile """
-
 @app.route("/profile")
 def profile():
     user = get_current_user_from_session()
@@ -265,13 +278,182 @@ def profile():
 
     return render_template('user/profile.html', user=user)
 
-@app.route("/user/edit")
+""" Edit Profile """
+@app.route("/user/edit", methods=["GET", "POST"])
 def edit_profile():
     user = get_current_user_from_session()
     if not user:
         return redirect(url_for("login"))
 
-    return render_template('user/editProfile.html')
+    if request.method == "POST":
+        #Photo button 
+        if 'photo' in request.files:
+            file = request.files['photo']
+            if file.filename == '':
+                flash('No selected file', 'error')
+                return redirect(request.url)
+            
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                
+                # Calculate file hash to check for duplicates
+                file_content = file.read()
+                file_hash = hashlib.sha256(file_content).hexdigest()
+                # Reset file pointer to beginning
+                file.seek(0)
+                
+                # Get file extension
+                file_ext = os.path.splitext(filename)[1].lower()
+                
+                # Create unique filename based on hash
+                unique_filename = f"{file_hash}{file_ext}"
+                
+                # Define path
+                relative_path = os.path.join('img', 'users', unique_filename)
+                full_path = os.path.join(app.root_path, 'static', relative_path)
+                
+                if not os.path.exists(full_path):
+                    os.makedirs(os.path.dirname(full_path), exist_ok=True)
+                    file.save(full_path)
+                
+                user.photo_url = f"img/users/{unique_filename}"
+                db.session.commit()
+                flash('Profile photo updated successfully', 'success')
+            else:
+                flash('Invalid file type', 'error')
+
+        #Lógica para cambiar el nombre
+        #Detecta si se ha enviado el formulario para cambiar el nombre
+        if 'username' in request.form:
+            #Almacenamos el texto ingresado en el campo de nombre de usuario
+            new_username = request.form.get('username')
+            #Comprobamos si el nombre de usuario es diferente al actual
+            if new_username != user.username:
+                #Comprobamos que no esté vacío
+                if not new_username:
+                    flash('Username cannot be empty.', 'error')
+                else:
+                    #Todo bien: asociamos nuevo nombre
+                    user.username = new_username
+                    db.session.commit()
+                    session["username"] = new_username # Update session
+                    flash('Username updated successfully.', 'success')
+
+        #Lógica de cambio de descripción
+        if 'description' in request.form:
+            #Almacenamos la nueva descripción
+            new_description = request.form.get('description')
+            #Comprobamos si la descripción es diferente a la actual
+            if new_description != user.description:
+                #Comprobamos que no esté vacío
+                if not new_description:
+                    flash('Description cannot be empty.', 'error')
+                else:
+                    #Todo bien: asociamos nueva descripción
+                    user.description = new_description
+                    db.session.commit()
+                    flash('Description updated successfully.', 'success')
+
+        return redirect(url_for("edit_profile"))
+
+    return render_template('user/editProfile.html', user=user)
+
+
+""" Upload Item """
+@app.route("/user/upload", methods=["GET", "POST"])
+def upload():
+    user = get_current_user_from_session()
+    if not user:
+        return redirect(url_for("login"))    
+
+    if request.method == "POST":
+        title = request.form.get("title")
+        description = request.form.get("description")
+        category = request.form.get("category")
+        price = request.form.get("price")
+
+        if not title or not description or not category or not price:
+             flash('Please fill in all required fields', 'error')
+             return redirect(request.url)
+        
+        try:
+            price = float(price)
+        except ValueError:
+            flash('Invalid price', 'error')
+            return redirect(request.url)
+
+        # Handle photos
+        if 'photos' in request.files:
+            files = request.files.getlist('photos')
+            
+            # Check if at least one file is selected (and not empty)
+            if not files or files[0].filename == '':
+                flash('At least one photo is required', 'error')
+                return redirect(request.url)
+
+            # Limit to 6 photos
+            if len(files) > 6:
+                flash('Maximum 6 photos allowed. Please select fewer photos.', 'error')
+                return redirect(request.url)
+
+            # Create Item only if validation passes
+            new_item = Item(name=title, description=description, price=price, category=category, user_id=user.id)
+            db.session.add(new_item)
+            db.session.commit() # Commit to get ID
+
+            #Gestionar cada foto
+            for file in files:
+                if file and file.filename != '' and allowed_file(file.filename):
+                    filename = secure_filename(file.filename)
+                    
+                    # Calculate hash
+                    file_content = file.read()
+                    file_hash = hashlib.sha256(file_content).hexdigest()
+                    file.seek(0)
+                    
+                    file_ext = os.path.splitext(filename)[1].lower()
+                    unique_filename = f"{file_hash}{file_ext}"
+                    
+                    relative_path = os.path.join('img', 'items', unique_filename)
+                    full_path = os.path.join(app.root_path, 'static', relative_path)
+                    
+                    if not os.path.exists(full_path):
+                        os.makedirs(os.path.dirname(full_path), exist_ok=True)
+                        file.save(full_path)
+                    
+                    # Create ItemImage
+                    new_image = ItemImage(image_url=f"img/items/{unique_filename}", item_id=new_item.id)
+                    db.session.add(new_image)
+            
+            db.session.commit()
+            flash('Item uploaded successfully!', 'success')
+            return redirect(url_for('dashboard')) # Redirect to dashboard or item page
+        
+        else:
+             # Item created without photos
+             flash('At least one photo is required', 'error')
+             return redirect(request.url)
+
+
+    return render_template('user/upload.html')
+
+""" Favorite Items """
+@app.route("/user/favItems")
+def favItems():
+    user = get_current_user_from_session()
+    if not user:
+        return redirect(url_for("login"))
+
+    return render_template('user/favItems.html')
+
+""" Messages """
+@app.route("/user/messages")
+def messages():
+    user = get_current_user_from_session()
+    if not user:
+        return redirect(url_for("login"))
+
+    return render_template('user/messages.html')
 
 """ Dashboard """
 
