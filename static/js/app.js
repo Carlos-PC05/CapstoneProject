@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const progressBar = document.getElementById('progressBar');
     const track = document.querySelector('.scroll-progress-track');
     const returnButton = document.querySelector('.return-button');
+    const favButtons = document.querySelectorAll('.favorite-btn');
 
     function updateProgress() {
         if (!categoryList) return;
@@ -343,4 +344,120 @@ document.addEventListener('DOMContentLoaded', function() {
 
         renderImagePreview();
     }
+    
+    if (favButtons.length > 0) {
+        const favoritesPath = '/user/favItems';
+        const toastContainer = document.getElementById('toast-container');
+
+        const showToast = (message, type = 'success') => {
+            if (!toastContainer) return;
+
+            const toast = document.createElement('div');
+            toast.className = `toast toast--${type}`;
+            toast.setAttribute('role', 'status');
+
+            const icon = type === 'success' ? '✓' : '!';
+            toast.innerHTML = `
+                <div class="toast__body">
+                    <span class="toast__icon" aria-hidden="true">${icon}</span>
+                    <span>${message}</span>
+                </div>
+                <button type="button" class="toast__close" aria-label="Dismiss alert">×</button>
+            `;
+
+            const removeToast = () => {
+                if (!toast.parentElement) return;
+                toast.classList.add('is-hiding');
+                setTimeout(() => {
+                    toast.remove();
+                }, 180);
+            };
+
+            const closeBtn = toast.querySelector('.toast__close');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', removeToast);
+            }
+
+            toastContainer.appendChild(toast);
+            setTimeout(removeToast, 2600);
+        };
+
+        const applyFavoriteState = (button, isFavorite) => {
+            button.classList.toggle('active', isFavorite);
+            button.dataset.isFavorite = isFavorite ? 'true' : 'false';
+
+            const heartIcon = button.querySelector('img');
+            if (heartIcon) {
+                heartIcon.src = isFavorite ? '/static/img/assets/RedHeart.svg' : '/static/img/assets/Heart.svg';
+            }
+
+            if (button.dataset.favoriteText === 'true') {
+                button.textContent = isFavorite ? 'Remove from favorites' : 'Add to favorites';
+            }
+        };
+
+        const maybeRenderEmptyFavoritesMessage = () => {
+            if (window.location.pathname !== favoritesPath) return;
+            if (document.querySelector('.contenedor-item')) return;
+            if (document.querySelector('[data-empty-favorites]')) return;
+
+            const message = document.createElement('p');
+            message.textContent = 'You do not have favorite items yet.';
+            message.setAttribute('data-empty-favorites', 'true');
+            message.classList.add('favorites-empty-state');
+
+            const contentRoot = document.querySelector('.favorites-page');
+            if (contentRoot) {
+                contentRoot.appendChild(message);
+            }
+        };
+
+        favButtons.forEach((button) => {
+            button.addEventListener('click', async function() {
+                const itemId = this.dataset.itemId;
+                if (!itemId || this.disabled) return;
+
+                this.disabled = true;
+
+                try {
+                    const response = await fetch(`/item/${itemId}/favorite`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Favorite toggle failed (${response.status})`);
+                    }
+
+                    const data = await response.json();
+                    if (!data.ok) {
+                        throw new Error(data.error || 'Favorite toggle failed');
+                    }
+
+                    applyFavoriteState(this, data.is_favorite);
+                    showToast(
+                        data.is_favorite ? 'Added to favorites.' : 'Removed from favorites.',
+                        'success'
+                    );
+
+                    if (window.location.pathname === favoritesPath && !data.is_favorite) {
+                        const card = this.closest('.contenedor-item');
+                        if (card) {
+                            card.remove();
+                            maybeRenderEmptyFavoritesMessage();
+                        }
+                    }
+                } catch (error) {
+                    // Keep current state if the server call fails.
+                    console.error(error);
+                    showToast('Could not update favorites. Try again.', 'error');
+                } finally {
+                    this.disabled = false;
+                }
+            });
+        });
+    }
+
 });

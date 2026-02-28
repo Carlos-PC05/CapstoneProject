@@ -11,9 +11,9 @@
     "watch": "sass --watch static/scss:static/css"
   },
   "keywords": [],
-  "author": "",
+  "author": "Carlos Parra Camacho",
   "license": "ISC",
-  "description": "",
+  "description": "Project for the Capstone Project course at DeSales University",
   "devDependencies": {
     "sass": "^1.97.3"
   }
