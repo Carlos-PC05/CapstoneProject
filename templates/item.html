@@ -2,6 +2,16 @@
 
 {% block content %}
 
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}   
+
     <!-- Mostrar objeto -->
 
     <div class="item-contenido">
@@ -31,40 +41,42 @@
                     </div>
                 {% endif %}
             </div>
-            <div class="divider"></div>
-            <div class="items-similares">
-                <h3 class="sitems-title">Articulos similares</h3>
-                <div class="contenedor">
-                    {% for similar_item in similar_items %}
-                        {% if similar_item.owner.id != session['user_id'] %}
-                            <div class="contenedor-item">
-                                <a href="{{ url_for('item', item_id=similar_item.id) }}" class="item-imagen-container skeleton-loading">
-                                    <img class="item-imagen" src="{{ url_for('static', filename=similar_item.image_url) }}" alt="{{ similar_item.name }}" loading="lazy" onload="this.parentElement.classList.remove('skeleton-loading')">
-                                    <div class="item-overlay"></div>
-                                </a>
+            {% if item.owner.id != session['user_id'] %}
+                <div class="divider"></div>
+                <div class="items-similares">
+                    <h3 class="sitems-title">Articulos similares</h3>
+                    <div class="contenedor">
+                        {% for similar_item in similar_items %}
+                            {% if similar_item.owner.id != session['user_id'] %}
+                                <div class="contenedor-item">
+                                    <a href="{{ url_for('item', item_id=similar_item.id) }}" class="item-imagen-container skeleton-loading">
+                                        <img class="item-imagen" src="{{ url_for('static', filename=similar_item.image_url) }}" alt="{{ similar_item.name }}" loading="lazy" onload="this.parentElement.classList.remove('skeleton-loading')">
+                                        <div class="item-overlay"></div>
+                                    </a>
 
-                                <div class="item-info">
-                                    <div class="item-header">
-                                        <h2 class="item-nombre">{{ similar_item.name }}</h2>
-                                        <div class="item-actions">
-                                            <button class="action-btn favorite-btn {% if similar_item.id in favorite_item_ids %}active{% endif %}" data-item-id="{{ similar_item.id }}" data-is-favorite="{% if similar_item.id in favorite_item_ids %}true{% else %}false{% endif %}" aria-label="Add to favorites">
-                                                <img src="{{ url_for('static', filename='img/assets/RedHeart.svg' if similar_item.id in favorite_item_ids else 'img/assets/Heart.svg') }}" alt="Favorito">
-                                            </button>
+                                    <div class="item-info">
+                                        <div class="item-header">
+                                            <h2 class="item-nombre">{{ similar_item.name }}</h2>
+                                            <div class="item-actions">
+                                                <button class="action-btn favorite-btn {% if similar_item.id in favorite_item_ids %}active{% endif %}" data-item-id="{{ similar_item.id }}" data-is-favorite="{% if similar_item.id in favorite_item_ids %}true{% else %}false{% endif %}" aria-label="Add to favorites">
+                                                    <img src="{{ url_for('static', filename='img/assets/RedHeart.svg' if similar_item.id in favorite_item_ids else 'img/assets/Heart.svg') }}" alt="Favorito">
+                                                </button>
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div class="item-details">
-                                        <p class="item-descripcion">{{ similar_item.description }}</p>
-                                        <p class="item-owner">{{ similar_item.owner.username }}</p>
-                                    </div>
+                                        <div class="item-details">
+                                            <p class="item-descripcion">{{ similar_item.description }}</p>
+                                            <p class="item-owner">{{ similar_item.owner.username }}</p>
+                                        </div>
 
-                                    <p class="item-precio">${{ similar_item.price }}</p>
+                                        <p class="item-precio">${{ similar_item.price }}</p>
+                                    </div>
                                 </div>
-                            </div>
-                        {% endif %}
-                    {% endfor %}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
                 </div>
-            </div>
+            {% endif %}
         </section>
 
         <aside class="item-sidebar">
@@ -111,16 +123,17 @@
 
                 {% if item.owner.id != session['user_id'] %}
                     <div class="item-actions">
-                        <button class="btn btn-primary">Purchase now</button>
-                        <button class="btn btn-outline">Make an offer</button>
-                        <button class="btn btn-outline">Send a message</button>
-                        <button class="btn btn-outline favorite-btn {% if item.id in favorite_item_ids %}active{% endif %}" data-item-id="{{ item.id }}" data-is-favorite="{% if item.id in favorite_item_ids %}true{% else %}false{% endif %}" data-favorite-text="true">
+                        <a class="btn btn-primary">Purchase now</a>
+                        <a class="btn btn-outline">Make an offer</a>
+                        <a class="btn btn-outline">Send a message</a>
+                        <a class="btn btn-outline favorite-btn {% if item.id in favorite_item_ids %}active{% endif %}" data-item-id="{{ item.id }}" data-is-favorite="{% if item.id in favorite_item_ids %}true{% else %}false{% endif %}" data-favorite-text="true">
                             {% if item.id in favorite_item_ids %}Remove from favorites{% else %}Add to favorites{% endif %}
-                        </button>
+                        </a>
                     </div>
                 {% else %}
                     <div class="item-actions">
-                        <button class="btn btn-primary">Edit item</button>
+                        <a href="{{ url_for('edit_item', item_id=item.id) }}" class="btn btn-primary">Edit item</a>
+                        <a href="{{url_for('delete', item_id=item.id)}}" class="btn btn-rojo">Delete item</a>
                     </div>
                 {% endif %}
             </div>

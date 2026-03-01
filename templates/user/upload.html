@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="upload-page">
-    <h1 class="page-title">Upload an Item</h1>
+    <h1 class="page-title">{{ 'Edit Item' if edit_mode else 'Upload an Item' }}</h1>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -14,18 +14,21 @@
         {% endif %}
     {% endwith %}
 
-    <form class="upload-form" action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
+    <form class="upload-form" action="{{ url_for('edit_item', item_id=item.id) if edit_mode else url_for('upload') }}" method="POST" enctype="multipart/form-data">
         
         <!-- Upload Photos Section -->
         <div class="form-section photo-upload-section">
             <div class="upload-placeholder">
                 <div class="upload-controls">
-                    <button type="button" class="btn-select-photos">Upload Photos</button>
+                    <button type="button" class="btn-select-photos">{{ 'Add Photos' if edit_mode else 'Upload Photos' }}</button>
                     <input type="file" name="photos" id="photos" accept="image/*" multiple hidden>
                     <p class="upload-hint">You can upload up to 6 photos</p>
                     <p class="upload-drop-hint">or drag and drop images here</p>
                     <p id="photo-count" class="upload-count"></p>
                 </div>
+                {% if edit_mode and item.images %}
+                    <p class="upload-hint">Current photos: {{ item.images|length }}</p>
+                {% endif %}
             </div>
         </div>
 
@@ -33,12 +36,12 @@
         <div class="form-section info-section">
             <div class="form-group">
                 <label for="title" class="form-label">Title</label>
-                <input type="text" id="title" name="title" class="form-input" placeholder="What are you uploading?">
+                <input type="text" id="title" name="title" class="form-input" placeholder="What are you uploading?" value="{{ item.name if edit_mode else '' }}">
             </div>
             <div class="form-divider"></div>
             <div class="form-group">
                 <label for="description" class="form-label">Description</label>
-                <textarea id="description" name="description" class="form-input" placeholder="Tell us more about it" rows="4"></textarea>
+                <textarea id="description" name="description" class="form-input" placeholder="Tell us more about it" rows="4">{{ item.description if edit_mode else '' }}</textarea>
             </div>
         </div>
 
@@ -48,15 +51,15 @@
                 <label for="category" class="form-label">Category</label>
                 <div class="select-wrapper">
                     <select id="category" name="category" class="form-input">
-                        <option value="" disabled selected>Select a Category</option>
-                        <option value="Books">Books</option>
-                        <option value="Furniture">Furniture</option>
-                        <option value="Bedding">Bedding</option>
-                        <option value="Appliances">Appliances</option>
-                        <option value="Clothes">Clothes</option>
-                        <option value="Sport">Sport</option>
-                        <option value="Electronics">Electronics</option>
-                        <option value="Others">Others</option>
+                        <option value="" disabled {% if not edit_mode %}selected{% endif %}>Select a Category</option>
+                        <option value="Books" {% if edit_mode and item.category == 'Books' %}selected{% endif %}>Books</option>
+                        <option value="Furniture" {% if edit_mode and item.category == 'Furniture' %}selected{% endif %}>Furniture</option>
+                        <option value="Bedding" {% if edit_mode and item.category == 'Bedding' %}selected{% endif %}>Bedding</option>
+                        <option value="Appliances" {% if edit_mode and item.category == 'Appliances' %}selected{% endif %}>Appliances</option>
+                        <option value="Clothes" {% if edit_mode and item.category == 'Clothes' %}selected{% endif %}>Clothes</option>
+                        <option value="Sport" {% if edit_mode and item.category == 'Sport' %}selected{% endif %}>Sport</option>
+                        <option value="Electronics" {% if edit_mode and item.category == 'Electronics' %}selected{% endif %}>Electronics</option>
+                        <option value="Others" {% if edit_mode and item.category == 'Others' %}selected{% endif %}>Others</option>
                     </select>
                 </div>
             </div>
@@ -66,14 +69,13 @@
         <div class="form-section price-section">
             <div class="form-group">
                 <label for="price" class="form-label">Price</label>
-                <input type="number" id="price" name="price" class="form-input" placeholder="$0.00" step="0.01" min="0">
+                <input type="number" id="price" name="price" class="form-input" placeholder="$0.00" step="0.01" min="0" value="{{ item.price if edit_mode else '' }}">
             </div>
         </div>
 
         <!-- Action Buttons -->
         <div class="form-actions">
-            <button type="button" class="btn-draft">Save as Draft</button>
-            <button type="submit" class="btn-upload">Upload</button>
+            <button type="submit" class="btn-upload">{{ 'Edit Item' if edit_mode else 'Upload' }}</button>
         </div>
     </form>
 </div>
