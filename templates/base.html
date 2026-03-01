@@ -29,7 +29,7 @@
                     <img src="{{ url_for('static', filename='img/assets/mail.svg') }}" alt="Mensajes">
                 </a>
                 <a href="{{ url_for('favItems') }}" class="nav-icon">
-                    <img src="{{ url_for('static', filename='img/assets/Heart.svg') }}" alt="Favoritos">
+                    <img src="{{ url_for('static', filename='img/assets/WhiteHeart.svg') }}" alt="Favoritos">
                 </a>
                 <a href="#" class="nav-icon">
                     <img src="{{ url_for('static', filename='img/assets/Bell.svg') }}" alt="Notificaciones">
@@ -72,6 +72,7 @@
             {% endblock %}
         </main>
     </div>
+    <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
 
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>

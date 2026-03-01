@@ -10,6 +10,7 @@ class User(db.Model):
     password = db.Column(db.String(255), nullable = False)
     is_active = db.Column(db.Boolean, default=False, nullable=False)
     items = db.relationship('Item', backref = 'owner', lazy = True)
+    favorite_items = db.relationship('Item', secondary='favorite', back_populates='favorited_by', lazy=True)
     country = db.Column(db.String(20), nullable = True, default = "")
     city = db.Column(db.String(20), nullable = True, default = "")
     description = db.Column(db.String(400), nullable = True, default = "")
@@ -33,6 +34,7 @@ class Item(db.Model):
     created_at = db.Column(db.DateTime, nullable = False, default = db.func.current_timestamp())
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = False)
     images = db.relationship('ItemImage', backref='item', lazy=True)
+    favorited_by = db.relationship('User', secondary='favorite', back_populates='favorite_items', lazy=True)
 
     @property
     def image_url(self):
@@ -50,3 +52,10 @@ class ItemImage(db.Model):
 
     def __repr__(self) -> str:
         return f"<ItemImage {self.image_url}>"
+
+class Favorite(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    item_id = db.Column(db.Integer, db.ForeignKey('item.id'), nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=db.func.current_timestamp())
+    __table_args__ = (db.UniqueConstraint('user_id', 'item_id', name='uq_favorite_user_item'),)

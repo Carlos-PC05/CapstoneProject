@@ -1,8 +1,8 @@
 import os
 import hashlib
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from werkzeug.utils import secure_filename
-from models import db, User, Item, ItemImage
+from models import db, User, Item, ItemImage, Favorite
 from utils import mail, generate_confirmation_token, confirm_token, send_email
 from dotenv import load_dotenv
 
@@ -443,8 +443,34 @@ def favItems():
     user = get_current_user_from_session()
     if not user:
         return redirect(url_for("login"))
+    
+    # Coger los items favoritos desde la relacion del usuario
+    favorite_items = user.favorite_items
+    return render_template('user/favItems.html', favorite_items=favorite_items)
 
-    return render_template('user/favItems.html')
+@app.route("/item/<int:item_id>/favorite", methods=["POST"])
+def toggle_favorite(item_id):
+    user = get_current_user_from_session()
+    if not user:
+        return jsonify({"ok": False, "error": "Unauthorized"}), 401
+
+    item = Item.query.get_or_404(item_id)
+
+    # Evitar favorites sobre articulos propios
+    if item.user_id == user.id:
+        return jsonify({"ok": False, "error": "You cannot favorite your own item"}), 400
+
+    existing_favorite = Favorite.query.filter_by(user_id=user.id, item_id=item.id).first()
+
+    if existing_favorite:
+        db.session.delete(existing_favorite)
+        db.session.commit()
+        return jsonify({"ok": True, "is_favorite": False, "item_id": item.id})
+
+    new_favorite = Favorite(user_id=user.id, item_id=item.id)
+    db.session.add(new_favorite)
+    db.session.commit()
+    return jsonify({"ok": True, "is_favorite": True, "item_id": item.id})
 
 """ Messages """
 @app.route("/user/messages")
@@ -459,18 +485,27 @@ def messages():
 
 @app.route("/dashboard")
 def dashboard():
+    user = get_current_user_from_session()
+    if not user:
+        return redirect(url_for("login"))
     #Recuperar todos los items de la base de datos
     items = Item.query.all()
     users = User.query.all()
-    return render_template('index.html', items=items, users=users)
+    favorite_item_ids = {favorite_item.id for favorite_item in user.favorite_items}
+    return render_template('index.html', items=items, users=users, favorite_item_ids=favorite_item_ids)
 
 @app.route("/item/<int:item_id>")
 def item(item_id):
+    user = get_current_user_from_session()
+    if not user:
+        return redirect(url_for("login"))
+
     #Recuperar el item de la base de datos
     item = Item.query.get_or_404(item_id)
     #Recuperar los items similares de la base de datos (límite de 10)
     similar_items = Item.query.filter_by(category=item.category).filter(Item.id != item.id).limit(10).all()
-    return render_template('item.html', item=item, similar_items=similar_items)
+    favorite_item_ids = {favorite_item.id for favorite_item in user.favorite_items}
+    return render_template('item.html', item=item, similar_items=similar_items, favorite_item_ids=favorite_item_ids)
 
 if __name__ == "__main__":
     with app.app_context():

@@ -1,15 +1,45 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="auth-container">
-    <div class="login-page">
-        <div class="login-card">
-            <h2>Favorite Items</h2>
-            <p>This page is under construction.</p>
-            <div class="form-actions">
-                <a href="{{ url_for('profile') }}" class="login-btn">Back to Profile</a>
+    <section class="favorites-page">
+        <header class="favorites-header">
+            <h1 class="favorites-title">Favorite Items</h1>
+            <p class="favorites-subtitle">Your saved items in one place.</p>
+        </header>
+
+        {% if favorite_items and favorite_items|length > 0 %}
+            <div class="contenedor favorites-grid">
+                {% for item in favorite_items %}
+                    {% if item.owner.id != session['user_id'] %}
+                        <div class="contenedor-item">
+                            <a href="{{ url_for('item', item_id=item.id) }}" class="item-imagen-container skeleton-loading">
+                                <img class="item-imagen" src="{{ url_for('static', filename=item.image_url) }}" alt="{{ item.name }}" loading="lazy" onload="this.parentElement.classList.remove('skeleton-loading')">
+                                <div class="item-overlay"></div>
+                            </a>
+
+                            <div class="item-info">
+                                <div class="item-header">
+                                    <h2 class="item-nombre">{{ item.name }}</h2>
+                                    <div class="item-actions">
+                                        <button class="action-btn favorite-btn active" data-item-id="{{ item.id }}" data-is-favorite="true" aria-label="Remove from favorites">
+                                            <img class="corazon" src="{{ url_for('static', filename='img/assets/RedHeart.svg') }}" alt="Favorito">
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="item-details">
+                                    <p class="item-descripcion">{{ item.description }}</p>
+                                    <p class="item-owner">{{ item.owner.username }}</p>
+                                </div>
+
+                                <p class="item-precio">${{ item.price }}</p>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
             </div>
-        </div>
-    </div>
-</div>
+        {% else %}
+            <p class="favorites-empty-state" data-empty-favorites="true">You do not have favorite items yet.</p>
+        {% endif %}
+    </section>
 {% endblock %}
