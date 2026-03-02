@@ -1,6 +1,34 @@
 @use '../base/mixins' as m;
 @use '../base/variables' as v;
 
+.alert {
+    margin: 1.5rem auto 0;
+    padding: 1rem 1.4rem;
+    border-radius: 0.9rem;
+    font-family: v.$fuente_textos;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: v.$blanco;
+    color: v.$negro;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    max-width: 1280px;
+}
+
+.alert.alert-success {
+    border-left: 4px solid v.$verde;
+    background: rgba(40, 167, 69, 0.08);
+    color: #155724;
+}
+
+.alert.alert-error {
+    border-left: 4px solid v.$rojo;
+    background: rgba(194, 15, 47, 0.08);
+    color: #721c24;
+}
+
 .item-contenido {
     display: flex;
     flex-direction: column;
@@ -271,6 +299,15 @@
                         
                         &:hover {
                             background-color: darken(v.$cian, 5%);
+                        }
+                    }
+
+                    &.btn-rojo {
+                        background-color: v.$rojo; // Usar color primario
+                        color: white;
+                        
+                        &:hover {
+                            background-color: darken(v.$rojo, 5%);
                         }
                     }
 

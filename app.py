@@ -358,7 +358,6 @@ def edit_profile():
 
     return render_template('user/editProfile.html', user=user)
 
-
 """ Upload Item """
 @app.route("/user/upload", methods=["GET", "POST"])
 def upload():
@@ -427,15 +426,106 @@ def upload():
             
             db.session.commit()
             flash('Item uploaded successfully!', 'success')
-            return redirect(url_for('dashboard')) # Redirect to dashboard or item page
+            return redirect(url_for('profile')) # Redirect to dashboard or item page
         
         else:
              # Item created without photos
              flash('At least one photo is required', 'error')
-             return redirect(request.url)
+             return redirect(url_for('upload'))
 
 
-    return render_template('user/upload.html')
+    return render_template('user/upload.html', edit_mode=False, item=None)
+
+""" Edit Item """
+@app.route("/item/<int:item_id>/edit", methods=["GET", "POST"])
+def edit_item(item_id):
+    user = get_current_user_from_session()
+    if not user:
+        return redirect(url_for("login"))
+
+    item = Item.query.get_or_404(item_id)
+    if item.user_id != user.id:
+        flash('You cannot edit this item.', 'error')
+        return redirect(url_for('item', item_id=item.id))
+
+    if request.method == "POST":
+        title = request.form.get("title")
+        description = request.form.get("description")
+        category = request.form.get("category")
+        price = request.form.get("price")
+
+        if not title or not description or not category or not price:
+            flash('Please fill in all required fields', 'error')
+            return redirect(request.url)
+
+        try:
+            price = float(price)
+        except ValueError:
+            flash('Invalid price', 'error')
+            return redirect(request.url)
+
+        item.name = title
+        item.description = description
+        item.category = category
+        item.price = price
+
+        files = []
+        if 'photos' in request.files:
+            files = [file for file in request.files.getlist('photos') if file and file.filename != '']
+
+        if files:
+            total_images = len(item.images) + len(files)
+            if total_images > 6:
+                flash('Maximum 6 photos allowed. Please select fewer photos.', 'error')
+                return redirect(request.url)
+
+            for file in files:
+                if file and file.filename != '' and allowed_file(file.filename):
+                    filename = secure_filename(file.filename)
+
+                    file_content = file.read()
+                    file_hash = hashlib.sha256(file_content).hexdigest()
+                    file.seek(0)
+
+                    file_ext = os.path.splitext(filename)[1].lower()
+                    unique_filename = f"{file_hash}{file_ext}"
+
+                    relative_path = os.path.join('img', 'items', unique_filename)
+                    full_path = os.path.join(app.root_path, 'static', relative_path)
+
+                    if not os.path.exists(full_path):
+                        os.makedirs(os.path.dirname(full_path), exist_ok=True)
+                        file.save(full_path)
+
+                    new_image = ItemImage(image_url=f"img/items/{unique_filename}", item_id=item.id)
+                    db.session.add(new_image)
+
+        db.session.commit()
+        flash('Item updated successfully!', 'success')
+        return redirect(url_for('item', item_id=item.id))
+
+    return render_template('user/upload.html', edit_mode=True, item=item)
+
+""" Delete Item """
+@app.route("/item/delete/<int:item_id>", methods=["GET"])
+def delete(item_id):
+    user = get_current_user_from_session()
+    if not user:
+        return redirect(url_for("login"))
+
+    #Coger item a eliminar
+    item = Item.query.get_or_404(item_id)
+    try:
+        # Eliminar imagenes del objeto
+        db.session.query(ItemImage).filter_by(item_id=item_id).delete()
+        # Eliminar item
+        db.session.delete(item)
+        db.session.commit()
+        flash('Item deleted successfully!', 'success')
+        return redirect(url_for('profile'))
+    except Exception as e:
+        return f"Error deleting item images: {str(e)}"
+
 
 """ Favorite Items """
 @app.route("/user/favItems")
@@ -493,6 +583,8 @@ def dashboard():
     users = User.query.all()
     favorite_item_ids = {favorite_item.id for favorite_item in user.favorite_items}
     return render_template('index.html', items=items, users=users, favorite_item_ids=favorite_item_ids)
+
+""" Item """
 
 @app.route("/item/<int:item_id>")
 def item(item_id):
