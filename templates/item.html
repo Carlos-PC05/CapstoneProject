@@ -124,8 +124,18 @@
                 {% if item.owner.id != session['user_id'] %}
                     <div class="item-actions">
                         <a class="btn btn-primary">Purchase now</a>
-                        <a class="btn btn-outline">Make an offer</a>
-                        <a class="btn btn-outline">Send a message</a>
+                        <a
+                            href="{{ url_for('messages', user_id=item.owner.id, item_id=item.id, intent='offer') }}"
+                            class="btn btn-outline"
+                        >
+                            Make an offer
+                        </a>
+                        <a
+                            href="{{ url_for('messages', user_id=item.owner.id, item_id=item.id, intent='message') }}"
+                            class="btn btn-outline"
+                        >
+                            Send a message
+                        </a>
                         <a class="btn btn-outline favorite-btn {% if item.id in favorite_item_ids %}active{% endif %}" data-item-id="{{ item.id }}" data-is-favorite="{% if item.id in favorite_item_ids %}true{% else %}false{% endif %}" data-favorite-text="true">
                             {% if item.id in favorite_item_ids %}Remove from favorites{% else %}Add to favorites{% endif %}
                         </a>

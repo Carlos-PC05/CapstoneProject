@@ -61,5 +61,4 @@ def send_email(to, subject, template):
     # Encolar tarea
     # Pasamos solo datos serializables (strings, ints, dicts), no objetos complejos como 'app'
     send_async_email(subject, to, template, sender, None)
-    
     return True

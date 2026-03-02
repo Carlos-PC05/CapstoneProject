@@ -1,6 +1,8 @@
 import os
 import hashlib
+#from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
+#from flask_socketio import SocketIO, emit, join_room
 from werkzeug.utils import secure_filename
 from models import db, User, Item, ItemImage, Favorite
 from utils import mail, generate_confirmation_token, confirm_token, send_email
@@ -35,6 +37,7 @@ def allowed_file(filename):
 app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("SQLALCHEMY_DATABASE_URI", "sqlite:///database.db")
 db.init_app(app)
 mail.init_app(app)
+#socketio = SocketIO(app, manage_session=False)
 
 
 def get_current_user_from_session():
@@ -599,6 +602,7 @@ def item(item_id):
     favorite_item_ids = {favorite_item.id for favorite_item in user.favorite_items}
     return render_template('item.html', item=item, similar_items=similar_items, favorite_item_ids=favorite_item_ids)
 
+""" App """
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
