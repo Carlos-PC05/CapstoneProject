@@ -37,7 +37,7 @@
 
     <div class="contenedor">
         {% for item in user.items %}
-            <div class="contenedor-item">
+            <div class="contenedor-item{% if item.estado|lower == 'comprado' %} comprado{% endif %}">
                 <a href="{{ url_for('item', item_id=item.id) }}" class="item-imagen-container">
                     <img class="item-imagen" src="{{ url_for('static', filename=item.image_url) }}" alt="{{ item.name }}" loading="lazy">
                 </a>

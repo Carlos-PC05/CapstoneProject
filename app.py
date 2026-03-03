@@ -574,6 +574,31 @@ def messages():
 
     return render_template('user/messages.html')
 
+""" Comprar Item
+    -------------
+    Provisional, solo para actualizar base de datos
+ """
+@app.route("/item/comprar/<int:item_id>", methods=["POST"])
+def comprar(item_id):
+    user = get_current_user_from_session()
+    if not user:
+        return redirect(url_for("login"))
+
+    #Recuperar el item de la base de datos y editar su estado
+    item = Item.query.get_or_404(item_id)
+    if item.user_id == user.id:
+        flash('You cannot purchase your own item.', 'error')
+        return redirect(url_for('item', item_id=item.id))
+
+    if (item.estado or "").lower() != "activo":
+        flash('This item is already purchased.', 'error')
+        return redirect(url_for('item', item_id=item.id))
+
+    item.estado = "comprado"
+    db.session.commit()
+    flash('Item purchased successfully!', 'success')
+    return redirect(url_for('item', item_id=item.id))
+
 """ Dashboard """
 
 @app.route("/dashboard")
@@ -582,7 +607,7 @@ def dashboard():
     if not user:
         return redirect(url_for("login"))
     #Recuperar todos los items de la base de datos
-    items = Item.query.all()
+    items = Item.query.filter(db.func.lower(Item.estado) == "activo").all()
     users = User.query.all()
     favorite_item_ids = {favorite_item.id for favorite_item in user.favorite_items}
     return render_template('index.html', items=items, users=users, favorite_item_ids=favorite_item_ids)
