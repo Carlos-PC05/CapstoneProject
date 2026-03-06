@@ -33,6 +33,7 @@ class Item(db.Model):
     category = db.Column(db.String(20), nullable = False)
     created_at = db.Column(db.DateTime, nullable = False, default = db.func.current_timestamp())
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = False)
+    estado = db.Column(db.String(20), nullable = False, default = "Activo")
     images = db.relationship('ItemImage', backref='item', lazy=True)
     favorited_by = db.relationship('User', secondary='favorite', back_populates='favorite_items', lazy=True)
 

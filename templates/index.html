@@ -5,36 +5,38 @@
 
     <div class="contenedor">
         {% for item in items %}
+            {% if item.estado|lower == "activo" %}
         <!-- Mostrar items -->
-            {% if item.owner.id != session['user_id'] %}
-            <!-- Mostrar item si no es del usuario actual -->
-                <div class="contenedor-item">
-                    <a href="{{ url_for('item', item_id=item.id) }}" class="item-imagen-container skeleton-loading">
-                        <img class="item-imagen" src="{{ url_for('static', filename=item.image_url) }}" alt="{{ item.name }}" loading="lazy" onload="this.parentElement.classList.remove('skeleton-loading')">
-                        <div class="item-overlay">
-                            <!-- Aqui podriamos poner badges de estado si existieran en el modelo -->
-                        </div>
-                    </a>
-
-                    <div class="item-info">
-                        <div class="item-header">
-                            <h2 class="item-nombre">{{ item.name }}</h2>
-                            <div class="item-actions">
-                                <!-- Boton de favorito -->
-                                <button class="action-btn favorite-btn {% if item.id in favorite_item_ids %}active{% endif %}" data-item-id="{{ item.id }}" data-is-favorite="{% if item.id in favorite_item_ids %}true{% else %}false{% endif %}" aria-label="Add to favorites">
-                                    <img class="corazon" src="{{ url_for('static', filename='img/assets/RedHeart.svg' if item.id in favorite_item_ids else 'img/assets/Heart.svg') }}" alt="Favorito">
-                                </button>
+                {% if item.owner.id != session['user_id'] %}
+                <!-- Mostrar item si no es del usuario actual -->
+                    <div class="contenedor-item">
+                        <a href="{{ url_for('item', item_id=item.id) }}" class="item-imagen-container skeleton-loading">
+                            <img class="item-imagen" src="{{ url_for('static', filename=item.image_url) }}" alt="{{ item.name }}" loading="lazy" onload="this.parentElement.classList.remove('skeleton-loading')">
+                            <div class="item-overlay">
+                                <!-- Aqui podriamos poner badges de estado si existieran en el modelo -->
                             </div>
-                        </div>
+                        </a>
 
-                        <div class="item-details">
-                            <p class="item-descripcion">{{ item.description }}</p>
-                            <p class="item-owner">{{ item.owner.username }}</p> <!-- Simplificado para mostrar solo nombre -->
-                        </div>
+                        <div class="item-info">
+                            <div class="item-header">
+                                <h2 class="item-nombre">{{ item.name }}</h2>
+                                <div class="item-actions">
+                                    <!-- Boton de favorito -->
+                                    <button class="action-btn favorite-btn {% if item.id in favorite_item_ids %}active{% endif %}" data-item-id="{{ item.id }}" data-is-favorite="{% if item.id in favorite_item_ids %}true{% else %}false{% endif %}" aria-label="Add to favorites">
+                                        <img class="corazon" src="{{ url_for('static', filename='img/assets/RedHeart.svg' if item.id in favorite_item_ids else 'img/assets/Heart.svg') }}" alt="Favorito">
+                                    </button>
+                                </div>
+                            </div>
 
-                        <p class="item-precio">${{ item.price }}</p>
+                            <div class="item-details">
+                                <p class="item-descripcion">{{ item.description }}</p>
+                                <p class="item-owner">{{ item.owner.username }}</p> <!-- Simplificado para mostrar solo nombre -->
+                            </div>
+
+                            <p class="item-precio">${{ item.price }}</p>
+                        </div>
                     </div>
-                </div>
+                {% endif %}
             {% endif %}
         {% endfor %}
     </div>

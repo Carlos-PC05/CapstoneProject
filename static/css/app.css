@@ -1,3 +1,4 @@
+@charset "UTF-8";
 /*! normalize.css v8.0.1 | MIT License | github.com/necolas/normalize.css */
 /* Document
    ========================================================================== */
@@ -1563,6 +1564,64 @@ body {
   background-color: #000;
   margin-bottom: 2rem;
   opacity: 0.3;
+}
+.profile-page .contenedor-item.comprado {
+  opacity: 0.72;
+  transition: opacity 0.2s ease;
+}
+.profile-page .contenedor-item.comprado .item-imagen-container {
+  filter: grayscale(0.6);
+  transition: filter 0.2s ease, opacity 0.2s ease;
+}
+.profile-page .contenedor-item.comprado .item-imagen-container::after {
+  content: "✓";
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(26, 26, 26, 0.72);
+  color: #ffffff;
+  font-family: "Work Sans", sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  line-height: 1;
+}
+.profile-page .contenedor-item.comprado .item-imagen-container:hover {
+  filter: grayscale(0.5) brightness(0.96);
+}
+.profile-page .contenedor-item.comprado .item-imagen-container:focus-visible {
+  outline: 2px solid #002857;
+  outline-offset: 2px;
+}
+.profile-page .contenedor-item.comprado .item-info .item-nombre {
+  color: #4a4a4a;
+  transition: color 0.2s ease;
+}
+.profile-page .contenedor-item.comprado .item-info .item-owner {
+  color: #6b6b6b;
+  transition: color 0.2s ease;
+}
+.profile-page .contenedor-item.comprado .item-info .item-precio {
+  color: #3f3f3f;
+  transition: color 0.2s ease;
+}
+.profile-page .contenedor-item.comprado:hover {
+  opacity: 0.84;
+}
+.profile-page .contenedor-item.comprado:focus-within {
+  opacity: 0.9;
+}
+@media (min-width: 768px) {
+  .profile-page .contenedor-item.comprado .item-imagen-container::after {
+    width: 2.4rem;
+    height: 2.4rem;
+    font-size: 1.2rem;
+  }
 }
 .profile-page .no-items {
   font-family: "Work Sans", sans-serif;
