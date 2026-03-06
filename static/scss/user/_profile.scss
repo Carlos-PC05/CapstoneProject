@@ -165,6 +165,79 @@
         opacity: 0.3;
     }
 
+    .contenedor-item.comprado {
+        opacity: 0.72;
+        transition: opacity 0.2s ease;
+
+        .item-imagen-container {
+            filter: grayscale(0.6);
+            transition: filter 0.2s ease, opacity 0.2s ease;
+
+            &::after {
+                content: "✓";
+                position: absolute;
+                top: 0.6rem;
+                right: 0.6rem;
+                width: 2.2rem;
+                height: 2.2rem;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background-color: rgba(26, 26, 26, 0.72);
+                color: #ffffff;
+                font-family: v.$fuente_textos;
+                font-size: 1.1rem;
+                font-weight: 600;
+                line-height: 1;
+            }
+
+            &:hover {
+                filter: grayscale(0.5) brightness(0.96);
+            }
+
+            &:focus-visible {
+                outline: 2px solid v.$azulMarino;
+                outline-offset: 2px;
+            }
+        }
+
+        .item-info {
+            .item-nombre {
+                color: #4a4a4a;
+                transition: color 0.2s ease;
+            }
+
+            .item-owner {
+                color: #6b6b6b;
+                transition: color 0.2s ease;
+            }
+
+            .item-precio {
+                color: #3f3f3f;
+                transition: color 0.2s ease;
+            }
+        }
+
+        &:hover {
+            opacity: 0.84;
+        }
+
+        &:focus-within {
+            opacity: 0.9;
+        }
+
+        @include m.tablet {
+            .item-imagen-container {
+                &::after {
+                    width: 2.4rem;
+                    height: 2.4rem;
+                    font-size: 1.2rem;
+                }
+            }
+        }
+    }
+
     .no-items {
         font-family: v.$fuente_textos;
         font-size: 1.2rem;
