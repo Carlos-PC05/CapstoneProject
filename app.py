@@ -82,10 +82,10 @@ def seed_data():
     db.session.commit() #ejecutamos la transacción
 
     #Crear Items
-    item1 = Item(name="Taza", description="Taza de ceramica", price=10.0, category="Hogar", images=[], user_id=user1.id)
-    item2 = Item(name="Lampara", description="Lampara LED", price=20.0, category="Hogar", images=[], user_id=user2.id)
-    item3 = Item(name="Mesa", description="Mesa de madera", price=30.0, category="Hogar", images=[], user_id=user3.id)
-    item4 = Item(name="Silla", description="Silla de plástico", price=40.0, category="Hogar", images=[], user_id=user1.id)
+    item1 = Item(name="Taza", description="Taza de ceramica", price=10.0, category="furniture", images=[], user_id=user1.id)
+    item2 = Item(name="Lampara", description="Lampara LED", price=20.0, category="furniture", images=[], user_id=user2.id)
+    item3 = Item(name="Mesa", description="Mesa de madera", price=30.0, category="furniture", images=[], user_id=user3.id)
+    item4 = Item(name="Silla", description="Silla de plástico", price=40.0, category="furniture", images=[], user_id=user1.id)
 
     db.session.add_all([item1, item2, item3, item4]) #Añadimos a la base de datos a estos items
     db.session.commit() #ejecutamos la transacción
@@ -371,7 +371,7 @@ def upload():
     if request.method == "POST":
         title = request.form.get("title")
         description = request.form.get("description")
-        category = request.form.get("category")
+        category = request.form.get("category").lower()
         price = request.form.get("price")
 
         if not title or not description or not category or not price:
@@ -454,7 +454,7 @@ def edit_item(item_id):
     if request.method == "POST":
         title = request.form.get("title")
         description = request.form.get("description")
-        category = request.form.get("category")
+        category = request.form.get("category").lower()
         price = request.form.get("price")
 
         if not title or not description or not category or not price:
@@ -607,7 +607,18 @@ def dashboard():
     if not user:
         return redirect(url_for("login"))
     #Recuperar todos los items de la base de datos
-    items = Item.query.filter(db.func.lower(Item.estado) == "activo").all()
+    category = (request.args.get("category") or "").strip().lower()
+    
+    base_query = Item.query.filter(
+        db.func.lower(Item.estado) == "activo",
+        Item.user_id != user.id
+    ).order_by(db.func.random())
+
+    if category and category != "all":
+        items = base_query.filter(db.func.lower(Item.category) == category).all()
+    else:
+        items = base_query.all()
+
     users = User.query.all()
     favorite_item_ids = {favorite_item.id for favorite_item in user.favorite_items}
     return render_template('index.html', items=items, users=users, favorite_item_ids=favorite_item_ids)

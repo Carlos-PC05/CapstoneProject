@@ -47,7 +47,7 @@
                     <h3 class="sitems-title">Articulos similares</h3>
                     <div class="contenedor">
                         {% for similar_item in similar_items %}
-                            {% if similar_item.owner.id != session['user_id'] %}
+                            {% if similar_item.owner.id != session['user_id'] and similar_item.status == 'active' %}
                                 <div class="contenedor-item">
                                     <a href="{{ url_for('item', item_id=similar_item.id) }}" class="item-imagen-container skeleton-loading">
                                         <img class="item-imagen" src="{{ url_for('static', filename=similar_item.image_url) }}" alt="{{ similar_item.name }}" loading="lazy" onload="this.parentElement.classList.remove('skeleton-loading')">
@@ -137,8 +137,9 @@
                         </a>
                     </div>
                 {% else %}
+                <!-- Edit item (solo propietario) -->
                     <div class="item-actions">
-                        <a class="btn btn-primary">Edit item</a>
+                        <a href="{{url_for('edit_item', item_id=item.id)}}" class="btn btn-primary">Edit item</a>
                         <a href="{{url_for('delete', item_id=item.id)}}" class="btn btn-rojo">Delete item</a>
                     </div>
                 {% endif %}

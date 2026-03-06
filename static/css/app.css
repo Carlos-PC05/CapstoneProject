@@ -592,7 +592,7 @@ body {
 .sidebar .lista-enlaces li {
   flex: 0 0 auto;
 }
-.sidebar .lista-enlaces li a {
+.sidebar .lista-enlaces li .filter-button {
   display: block;
   padding: 0.8rem 1rem;
   color: #010101;
@@ -602,7 +602,10 @@ body {
   transition: color 0.3s ease;
   border-bottom: 2px solid transparent;
 }
-.sidebar .lista-enlaces li a:hover {
+.sidebar .lista-enlaces li .filter-button:hover {
+  color: #C20F2F;
+}
+.sidebar .lista-enlaces li .filter-button.active {
   color: #C20F2F;
 }
 .sidebar::after {
@@ -646,16 +649,16 @@ body {
   }
   .sidebar .sidebar-header {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    margin-bottom: 2rem;
+    margin: 2rem;
     cursor: pointer;
     padding-left: 0.5rem;
   }
-  .sidebar .sidebar-header h3 {
+  .sidebar .sidebar-header .sidebar-header-allCategories {
     font-family: "Work Sans", sans-serif;
     font-weight: 600;
-    color: #999;
+    color: #010101;
     font-size: 0.9rem;
     text-transform: uppercase;
     letter-spacing: 1.5px;

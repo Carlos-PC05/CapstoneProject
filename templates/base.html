@@ -46,19 +46,19 @@
         <!-- Barra lateral -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <h3>All Categories</h3>
+                <a class="sidebar-header-allCategories" href="{{ url_for('dashboard') }}">All Categories</a>
             </div>
             
             <div class="scroll-container">
                 <ul class="lista-enlaces" id="categoryList">
-                    <li><a href="#">Books</a></li>
-                    <li><a href="#">Furniture</a></li>
-                    <li><a href="#">Bedding</a></li>
-                    <li><a href="#">Appliances</a></li>
-                    <li><a href="#">Clothes</a></li>
-                    <li><a href="#">Sport</a></li>
-                    <li><a href="#">Electronics</a></li>
-                    <li><a href="#">Others</a></li>
+                    <li><a class="filter-button" href="{{ url_for('dashboard', category='Books') }}">Books</a></li>
+                    <li><a class="filter-button" href="{{ url_for('dashboard', category='Furniture') }}">Furniture</a></li>
+                    <li><a class="filter-button" href="{{ url_for('dashboard', category='Bedding') }}">Bedding</a></li>
+                    <li><a class="filter-button" href="{{ url_for('dashboard', category='Appliances') }}">Appliances</a></li>
+                    <li><a class="filter-button" href="{{ url_for('dashboard', category='Clothes') }}">Clothes</a></li>
+                    <li><a class="filter-button" href="{{ url_for('dashboard', category='Sport') }}">Sport</a></li>
+                    <li><a class="filter-button" href="{{ url_for('dashboard', category='Electronics') }}">Electronics</a></li>
+                    <li><a class="filter-button" href="{{ url_for('dashboard', category='Others') }}">Others</a></li>
                 </ul>
                 <div class="scroll-progress-track">
                     <div class="scroll-progress-bar" id="progressBar"></div>

@@ -460,4 +460,39 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    /* Lógica de filtros */
+    const filterButtons = Array.from(document.querySelectorAll('.filter-button'));
+    if (filterButtons.length) {
+        const params = new URLSearchParams(window.location.search);
+        const activeCategory = (params.get('category') || '').toLowerCase();
+
+        const getCategoryFromHref = (href) => {
+            if (!href) return '';
+            try {
+                const url = new URL(href, window.location.origin);
+                return (url.searchParams.get('category') || '').toLowerCase();
+            } catch (error) {
+                return '';
+            }
+        };
+
+        const setActive = (category) => {
+            filterButtons.forEach((button) => {
+                const buttonCategory = getCategoryFromHref(button.getAttribute('href'));
+                button.classList.toggle('active', category && buttonCategory === category);
+            });
+        };
+
+        setActive(activeCategory);
+
+        filterButtons.forEach((button) => {
+            button.addEventListener('click', () => {
+                filterButtons.forEach((btn) => btn.classList.remove('active'));
+                button.classList.add('active');
+            });
+        });
+    }
+    /* Fin de la lógica de filtros */
+
+    /* Fin del archivo JS */
 });
