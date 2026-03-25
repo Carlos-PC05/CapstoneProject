@@ -5,7 +5,7 @@
 
     <div class="contenedor">
         {% for item in items %}
-            {% if item.estado|lower == "activo" %}
+            {% if item.estado|lower == "active" %}
         <!-- Mostrar items -->
                 {% if item.owner.id != session['user_id'] %}
                 <!-- Mostrar item si no es del usuario actual -->
