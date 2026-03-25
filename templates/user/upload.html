@@ -52,14 +52,14 @@
                 <div class="select-wrapper">
                     <select id="category" name="category" class="form-input">
                         <option value="" disabled {% if not edit_mode %}selected{% endif %}>Select a Category</option>
-                        <option value="Books" {% if edit_mode and item.category == 'Books' %}selected{% endif %}>Books</option>
-                        <option value="Furniture" {% if edit_mode and item.category == 'Furniture' %}selected{% endif %}>Furniture</option>
-                        <option value="Bedding" {% if edit_mode and item.category == 'Bedding' %}selected{% endif %}>Bedding</option>
-                        <option value="Appliances" {% if edit_mode and item.category == 'Appliances' %}selected{% endif %}>Appliances</option>
-                        <option value="Clothes" {% if edit_mode and item.category == 'Clothes' %}selected{% endif %}>Clothes</option>
-                        <option value="Sport" {% if edit_mode and item.category == 'Sport' %}selected{% endif %}>Sport</option>
-                        <option value="Electronics" {% if edit_mode and item.category == 'Electronics' %}selected{% endif %}>Electronics</option>
-                        <option value="Others" {% if edit_mode and item.category == 'Others' %}selected{% endif %}>Others</option>
+                        <option value="books" {% if edit_mode and item.category == 'Books' %}selected{% endif %}>Books</option>
+                        <option value="furniture" {% if edit_mode and item.category == 'Furniture' %}selected{% endif %}>Furniture</option>
+                        <option value="bedding" {% if edit_mode and item.category == 'Bedding' %}selected{% endif %}>Bedding</option>
+                        <option value="appliances" {% if edit_mode and item.category == 'Appliances' %}selected{% endif %}>Appliances</option>
+                        <option value="clothes" {% if edit_mode and item.category == 'Clothes' %}selected{% endif %}>Clothes</option>
+                        <option value="sport" {% if edit_mode and item.category == 'Sport' %}selected{% endif %}>Sport</option> 
+                        <option value="electronics" {% if edit_mode and item.category == 'Electronics' %}selected{% endif %}>Electronics</option>
+                        <option value="others" {% if edit_mode and item.category == 'Others' %}selected{% endif %}>Others</option>
                     </select>
                 </div>
             </div>
