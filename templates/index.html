@@ -3,6 +3,11 @@
 {% block content %}
     <!-- Mostrar objetos de la base de datos -->
 
+    {% if current_search_query %}
+        <p class="results-summary">Showing results for "{{ current_search_query }}"</p>
+    {% endif %}
+
+    {% if items %}
     <div class="contenedor">
         {% for item in items %}
             {% if item.estado|lower == "active" %}
@@ -40,5 +45,14 @@
             {% endif %}
         {% endfor %}
     </div>
+    {% else %}
+    <div class="results-empty-state">
+        {% if current_search_query %}
+            <p>No items found for "{{ current_search_query }}". Try a different search.</p>
+        {% else %}
+            <p>No items are available right now.</p>
+        {% endif %}
+    </div>
+    {% endif %}
 
 {% endblock %}
