@@ -1,5 +1,7 @@
 import os
 import hashlib
+import re
+import unicodedata
 #from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 #from flask_socketio import SocketIO, emit, join_room
@@ -7,6 +9,41 @@ from werkzeug.utils import secure_filename
 from models import db, User, Item, ItemImage, Favorite
 from utils import mail, generate_confirmation_token, confirm_token, send_email
 from dotenv import load_dotenv
+
+# Search scoring powered by RapidFuzz, with a difflib fallback for safety.
+try:
+    from rapidfuzz import fuzz
+except ImportError:  # pragma: no cover - fallback for environments without rapidfuzz
+    from difflib import SequenceMatcher
+
+    class _FallbackFuzz:
+        @staticmethod
+        def ratio(first, second):
+            return SequenceMatcher(None, first, second).ratio() * 100
+
+        @staticmethod
+        def partial_ratio(first, second):
+            if not first or not second:
+                return 0
+
+            shorter, longer = (first, second) if len(first) <= len(second) else (second, first)
+            if shorter in longer:
+                return 100
+
+            window = len(shorter)
+            best = 0
+            for index in range(max(len(longer) - window + 1, 1)):
+                candidate = longer[index:index + window]
+                best = max(best, SequenceMatcher(None, shorter, candidate).ratio() * 100)
+            return best
+
+        @staticmethod
+        def token_set_ratio(first, second):
+            first_tokens = " ".join(sorted(set(first.split())))
+            second_tokens = " ".join(sorted(set(second.split())))
+            return SequenceMatcher(None, first_tokens, second_tokens).ratio() * 100
+
+    fuzz = _FallbackFuzz()
 
 # Cargar variables de entorno desde el archivo .env
 load_dotenv()
@@ -31,6 +68,107 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+def normalize_search_text(value):
+    normalized_value = unicodedata.normalize("NFKD", value or "")
+    without_accents = "".join(
+        character for character in normalized_value
+        if not unicodedata.combining(character)
+    )
+    lowered_value = without_accents.lower().strip()
+    return re.sub(r"\s+", " ", lowered_value)
+
+
+def tokenize_search_text(value):
+    return [token for token in re.split(r"[^a-z0-9]+", value) if token]
+
+
+def score_search_match(item, normalized_query, query_tokens):
+    normalized_name = normalize_search_text(item.name)
+    normalized_description = normalize_search_text(item.description)
+    normalized_content = f"{normalized_name} {normalized_description}".strip()
+    content_tokens = tokenize_search_text(normalized_content)
+
+    score = 0
+    matched = False
+
+    if normalized_query in normalized_name:
+        score += 140
+        matched = True
+    elif normalized_query in normalized_description:
+        score += 95
+        matched = True
+    elif normalized_query in normalized_content:
+        score += 85
+        matched = True
+
+    for token in query_tokens:
+        if token in normalized_name:
+            score += 30
+            matched = True
+        elif token in normalized_description:
+            score += 18
+            matched = True
+
+    fuzzy_candidates = [
+        fuzz.partial_ratio(normalized_query, normalized_name),
+        fuzz.partial_ratio(normalized_query, normalized_description),
+        fuzz.partial_ratio(normalized_query, normalized_content),
+        fuzz.token_set_ratio(normalized_query, normalized_content),
+        fuzz.ratio(normalized_query, normalized_name),
+    ]
+
+    for token in content_tokens:
+        fuzzy_candidates.append(fuzz.ratio(normalized_query, token))
+        fuzzy_candidates.append(fuzz.partial_ratio(normalized_query, token))
+
+        for query_token in query_tokens:
+            fuzzy_candidates.append(fuzz.ratio(query_token, token))
+
+    best_fuzzy_score = max(fuzzy_candidates) if fuzzy_candidates else 0
+
+    if best_fuzzy_score >= 92:
+        score += 95
+        matched = True
+    elif best_fuzzy_score >= 84:
+        score += 75
+        matched = True
+    elif best_fuzzy_score >= 74:
+        score += 55
+        matched = True
+    elif best_fuzzy_score >= 68:
+        score += 35
+        matched = True
+
+    if normalized_query == normalized_name:
+        score += 50
+
+    return matched, score, best_fuzzy_score
+
+
+def search_items_for_dashboard(base_query, search_query):
+    normalized_query = normalize_search_text(search_query)
+    if not normalized_query:
+        return []
+
+    query_tokens = tokenize_search_text(normalized_query)
+    items = base_query.order_by(Item.id.asc()).all()
+    ranked_items = []
+    minimum_fuzzy_score = 88 if len(normalized_query) <= 3 else 74 if len(normalized_query) <= 5 else 78
+
+    for item in items:
+        matched, score, best_fuzzy_score = score_search_match(item, normalized_query, query_tokens)
+        if not matched:
+            continue
+
+        if score < 60 and best_fuzzy_score < minimum_fuzzy_score:
+            continue
+
+        ranked_items.append((score, item.created_at, item.id, item))
+
+    ranked_items.sort(key=lambda ranked_item: (-ranked_item[0], ranked_item[1], ranked_item[2]))
+    return [ranked_item[3] for ranked_item in ranked_items]
 
 """ Database """
 
@@ -61,6 +199,13 @@ def get_current_user_from_session():
     session.pop("user_id", None)
     session.pop("username", None)
     return None
+
+
+@app.context_processor
+def inject_search_query():
+    return {
+        "current_search_query": request.args.get("q", "").strip()
+    }
 
 #Seed de ejmplo 
 def seed_data():
@@ -613,17 +758,20 @@ def dashboard():
     if not user:
         return redirect(url_for("login"))
     #Recuperar todos los items de la base de datos
+    search_query = (request.args.get("q") or "").strip()
     category = (request.args.get("category") or "").strip().lower()
     
     base_query = Item.query.filter(
         db.func.lower(Item.estado) == "active",
         Item.user_id != user.id
-    ).order_by(db.func.random())
+    )
 
-    if category and category != "all":
-        items = base_query.filter(db.func.lower(Item.category) == category).all()
+    if search_query:
+        items = search_items_for_dashboard(base_query, search_query)
+    elif category and category != "all":
+        items = base_query.filter(db.func.lower(Item.category) == category).order_by(db.func.random()).all()
     else:
-        items = base_query.all()
+        items = base_query.order_by(db.func.random()).all()
 
     users = User.query.all()
     favorite_item_ids = {favorite_item.id for favorite_item in user.favorite_items}

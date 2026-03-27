@@ -16,11 +16,11 @@
             </a>
 
             <!-- Barra búsqueda -->
-            <form action="" class="search-form">
+            <form action="{{ url_for('dashboard') }}" method="GET" class="search-form" role="search">
                 <button type="submit" class="search-btn">
-                    <img src="{{ url_for('static', filename='img/assets/search-white-on-red.svg') }}" alt="Buscar">
+                    <img src="{{ url_for('static', filename='img/assets/search-white-on-red.svg') }}" alt="Search">
                 </button>
-                <input type="text" placeholder="Buscar...">
+                <input type="search" name="q" value="{{ current_search_query }}" placeholder="Search for items..." aria-label="Search for items">
             </form>
 
             <!-- Botones de navegación -->
