@@ -574,10 +574,7 @@ def messages():
 
     return render_template('user/messages.html')
 
-""" Comprar Item
-    -------------
-    Provisional, solo para actualizar base de datos
- """
+""" Comprar Item """
 @app.route("/item/comprar/<int:item_id>", methods=["POST"])
 def comprar(item_id):
     user = get_current_user_from_session()
@@ -590,13 +587,22 @@ def comprar(item_id):
         flash('You cannot purchase your own item.', 'error')
         return redirect(url_for('item', item_id=item.id))
 
-    if (item.estado or "").lower() != "activo":
+    if (item.estado or "").lower() != "active":
         flash('This item is already purchased.', 'error')
         return redirect(url_for('item', item_id=item.id))
 
     item.estado = "comprado"
     db.session.commit()
     flash('Item purchased successfully!', 'success')
+    #Enviar correo al dueño
+    send_email(
+        #to: dueño del objeto
+        to = item.owner.email,
+        #subject
+        subject = "You sold an item!",
+        #body
+        template = "Congratulations, you have sold an item!! Thank you for using DeSales Exchange Hub.",
+    )
     return redirect(url_for('item', item_id=item.id))
 
 """ Dashboard """
@@ -610,7 +616,7 @@ def dashboard():
     category = (request.args.get("category") or "").strip().lower()
     
     base_query = Item.query.filter(
-        db.func.lower(Item.estado) == "activo",
+        db.func.lower(Item.estado) == "active",
         Item.user_id != user.id
     ).order_by(db.func.random())
 

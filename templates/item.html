@@ -47,7 +47,7 @@
                     <h3 class="sitems-title">Articulos similares</h3>
                     <div class="contenedor">
                         {% for similar_item in similar_items %}
-                            {% if similar_item.owner.id != session['user_id'] and similar_item.status == 'active' %}
+                            {% if similar_item.owner.id != session['user_id'] and similar_item.estado == 'active' %}
                                 <div class="contenedor-item">
                                     <a href="{{ url_for('item', item_id=similar_item.id) }}" class="item-imagen-container skeleton-loading">
                                         <img class="item-imagen" src="{{ url_for('static', filename=similar_item.image_url) }}" alt="{{ similar_item.name }}" loading="lazy" onload="this.parentElement.classList.remove('skeleton-loading')">
@@ -123,7 +123,7 @@
 
                 {% if item.owner.id != session['user_id'] %}
                     <div class="item-actions">
-                        {% if item.estado|lower == 'activo' %}
+                        {% if item.estado|lower == 'active' %}
                             <form action="{{ url_for('comprar', item_id=item.id) }}" method="post">
                                 <button class="btn btn-primary" type="submit">Purchase now</button>
                             </form>
@@ -139,7 +139,12 @@
                 {% else %}
                 <!-- Edit item (solo propietario) -->
                     <div class="item-actions">
-                        <a href="{{url_for('edit_item', item_id=item.id)}}" class="btn btn-primary">Edit item</a>
+                        {% if item.estado|lower == 'active' %}
+                            <a href="{{url_for('edit_item', item_id=item.id)}}" class="btn btn-primary">Edit item</a>
+                        {% endif %}
+                        {% if item.estado|lower == 'comprado' %}
+                            <span class="btn btn-outline">Purchased</span>
+                        {% endif %}
                         <a href="{{url_for('delete', item_id=item.id)}}" class="btn btn-rojo">Delete item</a>
                     </div>
                 {% endif %}
