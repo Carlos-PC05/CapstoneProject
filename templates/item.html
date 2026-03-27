@@ -98,15 +98,11 @@
                     </div>
                     <div class="spec-row">
                         <span class="spec-label">Brand</span>
-                        <span class="spec-value action-text">Sin marca</span>
+                        <span class="spec-value action-text">{{ item.brand if item.brand else 'Unbranded' }}</span>
                     </div>
                     <div class="spec-row">
                         <span class="spec-label">Condition</span>
-                        <span class="spec-value action-text">Muy bueno</span>
-                    </div>
-                    <div class="spec-row">
-                        <span class="spec-label">Color</span>
-                        <span class="spec-value action-text">Varios</span>
+                        <span class="spec-value action-text">{{ condition_labels.get(item.condition, 'Not specified') if item.condition else 'Not specified' }}</span>
                     </div>
                     <div class="spec-row">
                         <span class="spec-label">Uploaded</span>

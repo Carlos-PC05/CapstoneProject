@@ -84,6 +84,21 @@ def tokenize_search_text(value):
     return [token for token in re.split(r"[^a-z0-9]+", value) if token]
 
 
+CONDITION_LABELS = {
+    "new": "New",
+    "like-new": "Like New",
+    "good": "Good",
+    "fair": "Fair",
+    "poor": "Poor",
+}
+
+VALID_CONDITIONS = set(CONDITION_LABELS.keys())
+
+
+def normalize_condition(value):
+    return (value or "").strip().lower()
+
+
 def score_search_match(item, normalized_query, query_tokens):
     normalized_name = normalize_search_text(item.name)
     normalized_description = normalize_search_text(item.description)
@@ -204,7 +219,8 @@ def get_current_user_from_session():
 @app.context_processor
 def inject_search_query():
     return {
-        "current_search_query": request.args.get("q", "").strip()
+        "current_search_query": request.args.get("q", "").strip(),
+        "condition_labels": CONDITION_LABELS,
     }
 
 #Seed de ejmplo 
@@ -227,12 +243,17 @@ def seed_data():
     db.session.commit() #ejecutamos la transacción
 
     #Crear Items
-    item1 = Item(name="Taza", description="Taza de ceramica", price=10.0, category="furniture", images=[], user_id=user1.id)
-    item2 = Item(name="Lampara", description="Lampara LED", price=20.0, category="furniture", images=[], user_id=user2.id)
-    item3 = Item(name="Mesa", description="Mesa de madera", price=30.0, category="furniture", images=[], user_id=user3.id)
-    item4 = Item(name="Silla", description="Silla de plástico", price=40.0, category="furniture", images=[], user_id=user1.id)
+    item1 = Item(name="Taza", description="Taza de ceramica", brand="", condition="good", price=10.0, category="furniture", images=[], user_id=user1.id)
+    item2 = Item(name="Lampara", description="Lampara LED", brand="Philips", condition="good", price=20.0, category="furniture", images=[], user_id=user2.id)
+    item3 = Item(name="Mesa", description="Mesa de madera", brand="Ikea", condition="fair", price=30.0, category="furniture", images=[], user_id=user3.id)
+    item4 = Item(name="Silla", description="Silla de plástico", brand="", condition="good", price=40.0, category="furniture", images=[], user_id=user1.id)
+    item5 = Item(name="Tennis Racket", description="Used tennis racket in good condition", brand="Wilson", condition="good", price=15.0, category="sport", images=[], user_id=user2.id)
+    item6 = Item(name="Padel Racket", description="Brand new padel racket, never used", brand="Bullpadel", condition="new", price=100.0, category="sport", images=[], user_id=user3.id)
+    item7 = Item(name="Pillow Set", description="Set of 2 comfortable pillows", brand="", condition="like-new", price=25.0, category="bedding", images=[], user_id=user1.id)
+    item8 = Item(name="Desk Lamp", description="Adjustable desk lamp with LED light", brand="Xiaomi", condition="good", price=35.0, category="electronics", images=[], user_id=user2.id)
+    item9 = Item(name="Jacket", description="Warm winter jacket, size M", brand="Zara", condition="fair", price=50.0, category="clothes", images=[], user_id=user3.id)
 
-    db.session.add_all([item1, item2, item3, item4]) #Añadimos a la base de datos a estos items
+    db.session.add_all([item1, item2, item3, item4, item5, item6, item7, item8, item9]) #Añadimos a la base de datos a estos items
     db.session.commit() #ejecutamos la transacción
 
     # Add images
@@ -243,8 +264,13 @@ def seed_data():
     img5 = ItemImage(image_url="img/items/taza2.jpg", item=item1)
     img6 = ItemImage(image_url="img/items/taza3.jpg", item=item1)
     img7 = ItemImage(image_url="img/items/taza4.jpg", item=item1)
+    img8 = ItemImage(image_url="img/items/tennis.jpg", item=item5)
+    img9 = ItemImage(image_url="img/items/padel.jpg", item=item6)
+    img10 = ItemImage(image_url="img/items/pillows.jpg", item=item7)
+    img11 = ItemImage(image_url="img/items/deskLamp.jpg", item=item8)
+    img12 = ItemImage(image_url="img/items/jacket.jpg", item=item9)
     
-    db.session.add_all([img1, img2, img3, img4, img5, img6, img7])
+    db.session.add_all([img1, img2, img3, img4, img5, img6, img7, img8, img9, img10, img11, img12])
     db.session.commit()
 
 """ 
@@ -514,14 +540,20 @@ def upload():
         return redirect(url_for("login"))    
 
     if request.method == "POST":
-        title = request.form.get("title")
-        description = request.form.get("description")
-        category = request.form.get("category").lower()
+        title = (request.form.get("title") or "").strip()
+        description = (request.form.get("description") or "").strip()
+        brand = (request.form.get("brand") or "").strip()
+        condition = normalize_condition(request.form.get("condition"))
+        category = (request.form.get("category") or "").strip().lower()
         price = request.form.get("price")
 
-        if not title or not description or not category or not price:
+        if not title or not description or not condition or not category or not price:
              flash('Please fill in all required fields', 'error')
              return redirect(request.url)
+
+        if condition not in VALID_CONDITIONS:
+            flash('Invalid condition', 'error')
+            return redirect(request.url)
         
         try:
             price = float(price)
@@ -544,7 +576,7 @@ def upload():
                 return redirect(request.url)
 
             # Create Item only if validation passes
-            new_item = Item(name=title, description=description, price=price, category=category, user_id=user.id)
+            new_item = Item(name=title, description=description, brand=brand, condition=condition, price=price, category=category, user_id=user.id)
             db.session.add(new_item)
             db.session.commit() # Commit to get ID
 
@@ -597,13 +629,19 @@ def edit_item(item_id):
         return redirect(url_for('item', item_id=item.id))
 
     if request.method == "POST":
-        title = request.form.get("title")
-        description = request.form.get("description")
-        category = request.form.get("category").lower()
+        title = (request.form.get("title") or "").strip()
+        description = (request.form.get("description") or "").strip()
+        brand = (request.form.get("brand") or "").strip()
+        condition = normalize_condition(request.form.get("condition"))
+        category = (request.form.get("category") or "").strip().lower()
         price = request.form.get("price")
 
-        if not title or not description or not category or not price:
+        if not title or not description or not condition or not category or not price:
             flash('Please fill in all required fields', 'error')
+            return redirect(request.url)
+
+        if condition not in VALID_CONDITIONS:
+            flash('Invalid condition', 'error')
             return redirect(request.url)
 
         try:
@@ -614,6 +652,8 @@ def edit_item(item_id):
 
         item.name = title
         item.description = description
+        item.brand = brand
+        item.condition = condition
         item.category = category
         item.price = price
 
