@@ -5,6 +5,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const track = document.querySelector('.scroll-progress-track');
     const returnButton = document.querySelector('.return-button');
     const favButtons = document.querySelectorAll('.favorite-btn');
+    const accountMenu = document.querySelector('.account-menu');
+    const accountMenuToggle = document.querySelector('.account-menu-toggle');
+    const accountMenuPanel = document.getElementById('account-menu-panel');
 
     function updateProgress() {
         if (!categoryList) return;
@@ -28,6 +31,35 @@ document.addEventListener('DOMContentLoaded', function() {
         window.addEventListener('resize', updateProgress);
         // Inicializar
         updateProgress();
+    }
+
+    /* Account Menu Logic */
+    if (accountMenu && accountMenuToggle && accountMenuPanel) {
+        const setAccountMenuOpen = (isOpen) => {
+            accountMenu.classList.toggle('is-open', isOpen);
+            accountMenuToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        };
+
+        accountMenuToggle.addEventListener('click', function(event) {
+            event.stopPropagation();
+            setAccountMenuOpen(!accountMenu.classList.contains('is-open'));
+        });
+
+        accountMenuPanel.addEventListener('click', function(event) {
+            event.stopPropagation();
+        });
+
+        document.addEventListener('click', function(event) {
+            if (!accountMenu.contains(event.target)) {
+                setAccountMenuOpen(false);
+            }
+        });
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                setAccountMenuOpen(false);
+            }
+        });
     }
 
     // Carousel Logic

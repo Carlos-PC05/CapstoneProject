@@ -31,12 +31,22 @@
                 <a href="{{ url_for('favItems') }}" class="nav-icon">
                     <img src="{{ url_for('static', filename='img/assets/WhiteHeart.svg') }}" alt="Favoritos">
                 </a>
-                <a href="#" class="nav-icon">
-                    <img src="{{ url_for('static', filename='img/assets/Bell.svg') }}" alt="Notificaciones">
-                </a>
-                <a href="{{ url_for('profile') }}" class="nav-icon">
-                    <img src="{{ url_for('static', filename='img/assets/User.svg') }}" alt="Perfil">
-                </a>
+                <div class="account-menu">
+                    <button
+                        type="button"
+                        class="account-menu-toggle nav-icon"
+                        aria-label="Open account menu"
+                        aria-haspopup="true"
+                        aria-expanded="false"
+                        aria-controls="account-menu-panel"
+                    >
+                        <img src="{{ url_for('static', filename='img/assets/User.svg') }}" alt="">
+                    </button>
+                    <div class="account-menu-panel" id="account-menu-panel" role="menu">
+                        <a href="{{ url_for('profile') }}" class="account-menu-link" role="menuitem">My Profile</a>
+                        <a href="{{ url_for('logout') }}" class="account-menu-link account-menu-link--danger" role="menuitem">Log out</a>
+                    </div>
+                </div>
                 <a href="{{ url_for('upload') }}" class="upload-button">Upload</a>
             </div>
         </div>

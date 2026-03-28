@@ -316,6 +316,7 @@ def login():
         return redirect(url_for("dashboard"))
     return render_template('auth/login.html')
 
+""" Logout """
 @app.route("/logout")
 def logout():
     session.clear()

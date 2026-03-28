@@ -499,15 +499,69 @@ body {
   width: 44px;
   height: 44px;
   border-radius: 50%;
+  border: none;
+  background: transparent;
+  cursor: pointer;
   transition: background-color 0.3s ease;
 }
 .nav-buttons .nav-icon:hover {
   background-color: rgba(255, 255, 255, 0.1);
 }
+.nav-buttons .nav-icon:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.75);
+  outline-offset: 3px;
+}
 .nav-buttons .nav-icon img {
   width: 24px;
   height: 24px;
   display: block;
+}
+.nav-buttons .account-menu {
+  position: relative;
+}
+.nav-buttons .account-menu.is-open .account-menu-panel {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+.nav-buttons .account-menu-panel {
+  position: absolute;
+  top: calc(100% + 0.75rem);
+  right: 0;
+  min-width: 11rem;
+  padding: 0.5rem;
+  border-radius: 0.9rem;
+  background-color: #ffffff;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(26, 26, 26, 0.08);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-6px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  z-index: 1100;
+}
+.nav-buttons .account-menu-link {
+  display: block;
+  padding: 0.85rem 1rem;
+  border-radius: 0.6rem;
+  color: #1A1A1A;
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+.nav-buttons .account-menu-link:hover, .nav-buttons .account-menu-link:focus-visible {
+  background-color: #f4f4f4;
+  color: #1A1A1A;
+  outline: none;
+}
+.nav-buttons .account-menu-link--danger {
+  color: #C20F2F;
+}
+.nav-buttons .account-menu-link--danger:hover, .nav-buttons .account-menu-link--danger:focus-visible {
+  background-color: rgba(194, 15, 47, 0.08);
+  color: rgb(165.5961722488, 12.8038277512, 40.1186602871);
 }
 .nav-buttons .upload-button {
   background-color: #C20F2F;
