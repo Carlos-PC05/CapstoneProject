@@ -29,6 +29,8 @@ class Item(db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement = True)
     name = db.Column(db.String(50), nullable = False)
     description = db.Column(db.String(400), nullable = False)
+    condition = db.Column(db.String(20), nullable = True, default = "")
+    brand = db.Column(db.String(50), nullable = True, default = "")
     price = db.Column(db.Float, nullable = False)
     category = db.Column(db.String(20), nullable = False)
     created_at = db.Column(db.DateTime, nullable = False, default = db.func.current_timestamp())
