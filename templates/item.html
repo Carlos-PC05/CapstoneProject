@@ -115,6 +115,11 @@
                 <h1 class="item-title">{{ item.name }}</h1>
                 <p class="item-description">{{ item.description }}</p>
 
+                {% if item_unavailable %}
+                    <div class="divider"></div>
+                    <p class="item-description">This item has been removed from the marketplace. Existing conversations may continue, but new buyers cannot contact the seller from this page.</p>
+                {% endif %}
+
                 <div class="divider"></div>
 
                 {% if item.owner.id != session['user_id'] %}
@@ -123,14 +128,18 @@
                             <form action="{{ url_for('comprar', item_id=item.id) }}" method="post">
                                 <button class="btn btn-primary" type="submit">Purchase now</button>
                             </form>
+                        {% elif item.estado|lower == 'deleted' %}
+                            <span class="btn btn-outline">Unavailable</span>
                         {% else %}
                             <span class="btn btn-outline">Purchased</span>
                         {% endif %}
-                        <a class="btn btn-outline">Make an offer</a>
-                        <a class="btn btn-outline">Send a message</a>
-                        <a class="btn btn-outline favorite-btn {% if item.id in favorite_item_ids %}active{% endif %}" data-item-id="{{ item.id }}" data-is-favorite="{% if item.id in favorite_item_ids %}true{% else %}false{% endif %}" data-favorite-text="true">
-                            {% if item.id in favorite_item_ids %}Remove from favorites{% else %}Add to favorites{% endif %}
-                        </a>
+                        {% if item.estado|lower != 'deleted' %}
+                            <a class="btn btn-outline">Make an offer</a>
+                            <a href="{{ url_for('start_item_conversation', item_id=item.id) }}" class="btn btn-outline">Send a message</a>
+                            <a class="btn btn-outline favorite-btn {% if item.id in favorite_item_ids %}active{% endif %}" data-item-id="{{ item.id }}" data-is-favorite="{% if item.id in favorite_item_ids %}true{% else %}false{% endif %}" data-favorite-text="true">
+                                {% if item.id in favorite_item_ids %}Remove from favorites{% else %}Add to favorites{% endif %}
+                            </a>
+                        {% endif %}
                     </div>
                 {% else %}
                 <!-- Edit item (solo propietario) -->
@@ -140,6 +149,9 @@
                         {% endif %}
                         {% if item.estado|lower == 'comprado' %}
                             <span class="btn btn-outline">Purchased</span>
+                        {% endif %}
+                        {% if item.estado|lower == 'deleted' %}
+                            <span class="btn btn-outline">Deleted</span>
                         {% endif %}
                         <a href="{{url_for('delete', item_id=item.id)}}" class="btn btn-rojo">Delete item</a>
                     </div>

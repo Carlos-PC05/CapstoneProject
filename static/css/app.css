@@ -2395,6 +2395,31 @@ body {
   text-overflow: ellipsis;
 }
 
+.conversation-item-name {
+  display: block;
+  margin-top: 0.2rem;
+  color: #6b6b6b;
+  font-size: 0.8rem;
+}
+
+.conversation-preview-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.conversation-unread {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background-color: #f94931;
+  flex: 0 0 auto;
+}
+
+.conversation-unread.is-hidden {
+  display: none;
+}
+
 .chat-main {
   background-color: #ffffff;
   border-radius: 12px;
@@ -2423,6 +2448,15 @@ body {
   margin: 0.35rem 0 0;
   color: #6b6b6b;
   font-size: 0.9rem;
+}
+
+.chat-item-status {
+  display: inline-block;
+  margin-left: 0.45rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #1d3b8f;
 }
 
 .chat-context-image-wrap img {
@@ -2483,6 +2517,17 @@ body {
   font-size: 0.72rem;
   opacity: 0.8;
   align-self: flex-end;
+}
+
+.chat-empty,
+.chat-empty-state {
+  margin: auto;
+  text-align: center;
+  color: #676767;
+}
+
+.chat-empty-state h3 {
+  margin-bottom: 0.4rem;
 }
 
 .chat-form {
