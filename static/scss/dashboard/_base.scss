@@ -230,6 +230,7 @@ body {
     flex-direction: column; // En móvil y tablet: uno debajo de otro
     position: relative;
     flex: 1;
+    min-height: 0;
 
     @include m.desktop {
         flex-direction: row; // Solo en desktop: lado a lado
@@ -415,6 +416,11 @@ body {
     flex-grow: 1;
     padding: 2rem;
     background-color: #f4f4f4;
+    min-height: 0;
+}
+
+.main-content:has(.messages-page) {
+    overflow: hidden;
 }
 
 .results-summary {
