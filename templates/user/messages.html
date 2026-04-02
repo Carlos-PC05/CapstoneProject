@@ -1,15 +1,109 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="auth-container">
-    <div class="login-page">
-        <div class="login-card">
+<section
+    class="messages-page"
+    data-messages-page="true"
+    data-current-user-id="{{ current_user.id }}"
+    data-selected-conversation-id="{{ selected_conversation.id if selected_conversation else '' }}"
+>
+    <aside class="chat-sidebar">
+        <div class="chat-sidebar-header">
             <h2>Messages</h2>
-            <p>This page is under construction.</p>
-            <div class="form-actions">
-                <a href="{{ url_for('profile') }}" class="login-btn">Back to Profile</a>
-            </div>
         </div>
-    </div>
-</div>
+
+        <div class="conversation-list" data-conversation-list>
+            {% if conversations %}
+                {% for conversation in conversations %}
+                    <button
+                        type="button"
+                        class="conversation-item{% if selected_conversation and selected_conversation.id == conversation.id %} active{% endif %}"
+                        data-conversation-id="{{ conversation.id }}"
+                        data-url="{{ conversation.messages_url }}"
+                    >
+                        <span class="conversation-avatar">
+                            {% if conversation.other_user_photo_url %}
+                                <img src="{{ conversation.other_user_photo_url }}" alt="{{ conversation.other_user_name }}">
+                            {% else %}
+                                {{ conversation.other_user_name[0].upper() }}
+                            {% endif %}
+                        </span>
+
+                        <span class="conversation-body">
+                            <span class="conversation-top">
+                                <span class="conversation-name">{{ conversation.other_user_name }}</span>
+                                <span class="conversation-time" data-last-time>{{ conversation.last_message_at }}</span>
+                            </span>
+                            <span class="conversation-item-name">{{ conversation.item_name }}</span>
+                            <span class="conversation-preview-row">
+                                <span class="conversation-preview" data-last-preview>{{ conversation.last_message_preview }}</span>
+                                <span class="conversation-unread{% if not conversation.is_unread %} is-hidden{% endif %}" data-unread-dot></span>
+                            </span>
+                        </span>
+                    </button>
+                {% endfor %}
+            {% else %}
+                <p class="conversation-empty">You do not have conversations yet.</p>
+            {% endif %}
+        </div>
+    </aside>
+
+    <section class="chat-main">
+        {% if selected_conversation %}
+            <header class="chat-header">
+                <div>
+                    <h3 class="chat-user-name">{{ selected_conversation.other_user_name }}</h3>
+                    <p class="chat-item-context">
+                        About {{ selected_conversation.item_name }}
+                        {% if selected_conversation.item_status %}
+                            <span class="chat-item-status">{{ selected_conversation.item_status|capitalize }}</span>
+                        {% endif %}
+                    </p>
+                </div>
+
+                <div class="chat-context-image-wrap">
+                    <img src="{{ selected_conversation.item_image_url }}" alt="{{ selected_conversation.item_name }}">
+                </div>
+            </header>
+
+            <div class="chat-error" data-chat-error hidden></div>
+
+            <div class="chat-log" data-chat-log>
+                {% if selected_messages %}
+                    {% for message in selected_messages %}
+                        <article class="chat-message {% if message.is_own %}is-own{% else %}is-other{% endif %}" data-message-id="{{ message.id }}">
+                            <p class="chat-message-body">{{ message.body }}</p>
+                            <span class="chat-message-time">{{ message.created_at }}</span>
+                        </article>
+                    {% endfor %}
+                {% else %}
+                    <p class="chat-empty" data-chat-empty>Start the conversation by sending your first message.</p>
+                {% endif %}
+            </div>
+
+            <form class="chat-form" data-chat-form>
+                <input
+                    type="text"
+                    name="body"
+                    maxlength="1000"
+                    placeholder="Write a message..."
+                    autocomplete="off"
+                    required
+                    data-chat-input
+                >
+                <button type="submit">Send</button>
+            </form>
+        {% else %}
+            <div class="chat-empty-state">
+                <h3>No conversation selected</h3>
+                <p>Choose a conversation from the left to view messages.</p>
+            </div>
+        {% endif %}
+    </section>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+    {{ super() }}
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js" crossorigin="anonymous"></script>
 {% endblock %}

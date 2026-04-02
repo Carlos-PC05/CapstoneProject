@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const accountMenu = document.querySelector('.account-menu');
     const accountMenuToggle = document.querySelector('.account-menu-toggle');
     const accountMenuPanel = document.getElementById('account-menu-panel');
+    const messagesPage = document.querySelector('[data-messages-page]');
 
     function updateProgress() {
         if (!categoryList) return;
@@ -375,6 +376,224 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         renderImagePreview();
+    }
+
+    /* 
+        SocketIO Setup 
+    */
+
+    if (messagesPage) {
+        const currentUserId = Number(messagesPage.dataset.currentUserId || 0);
+        const selectedConversationId = Number(messagesPage.dataset.selectedConversationId || 0);
+        const conversationList = messagesPage.querySelector('[data-conversation-list]');
+        const chatLog = messagesPage.querySelector('[data-chat-log]');
+        const chatForm = messagesPage.querySelector('[data-chat-form]');
+        const chatInput = messagesPage.querySelector('[data-chat-input]');
+        const chatError = messagesPage.querySelector('[data-chat-error]');
+
+        const showChatError = (message) => {
+            if (chatError) {
+                chatError.hidden = false;
+                chatError.textContent = message;
+            }
+        };
+
+        const clearChatError = () => {
+            if (chatError) {
+                chatError.hidden = true;
+                chatError.textContent = '';
+            }
+        };
+
+        const createConversationButton = (conversation) => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'conversation-item';
+            button.dataset.conversationId = conversation.id;
+            button.dataset.url = conversation.messages_url;
+
+            const avatar = conversation.other_user_photo_url
+                ? `<img src="${conversation.other_user_photo_url}" alt="${conversation.other_user_name}">`
+                : conversation.other_user_name.charAt(0).toUpperCase();
+
+            button.innerHTML = `
+                <span class="conversation-avatar">${avatar}</span>
+                <span class="conversation-body">
+                    <span class="conversation-top">
+                        <span class="conversation-name">${conversation.other_user_name}</span>
+                        <span class="conversation-time" data-last-time>${conversation.last_message_at || ''}</span>
+                    </span>
+                    <span class="conversation-item-name">${conversation.item_name}</span>
+                    <span class="conversation-preview-row">
+                        <span class="conversation-preview" data-last-preview>${conversation.last_message_preview || ''}</span>
+                        <span class="conversation-unread${conversation.is_unread ? '' : ' is-hidden'}" data-unread-dot></span>
+                    </span>
+                </span>
+            `;
+
+            button.addEventListener('click', () => {
+                window.location.href = button.dataset.url;
+            });
+
+            return button;
+        };
+
+        const updateConversationButton = (button, conversation) => {
+            button.dataset.url = conversation.messages_url;
+            const nameNode = button.querySelector('.conversation-name');
+            const timeNode = button.querySelector('[data-last-time]');
+            const previewNode = button.querySelector('[data-last-preview]');
+            const unreadDot = button.querySelector('[data-unread-dot]');
+            const itemNameNode = button.querySelector('.conversation-item-name');
+            const avatarNode = button.querySelector('.conversation-avatar');
+
+            if (nameNode) nameNode.textContent = conversation.other_user_name;
+            if (timeNode) timeNode.textContent = conversation.last_message_at || '';
+            if (previewNode) previewNode.textContent = conversation.last_message_preview || '';
+            if (itemNameNode) itemNameNode.textContent = conversation.item_name || '';
+
+            if (avatarNode) {
+                avatarNode.innerHTML = conversation.other_user_photo_url
+                    ? `<img src="${conversation.other_user_photo_url}" alt="${conversation.other_user_name}">`
+                    : conversation.other_user_name.charAt(0).toUpperCase();
+            }
+
+            if (unreadDot) {
+                const shouldHide = Number(conversation.id) === selectedConversationId ? true : !conversation.is_unread;
+                unreadDot.classList.toggle('is-hidden', shouldHide);
+            }
+        };
+
+        const appendChatMessage = (message) => {
+            if (!chatLog) return;
+            if (chatLog.querySelector(`[data-message-id="${message.id}"]`)) return;
+
+            const emptyState = chatLog.querySelector('[data-chat-empty]');
+            if (emptyState) {
+                emptyState.remove();
+            }
+
+            const article = document.createElement('article');
+            const isOwnMessage = Number(message.sender_id) === currentUserId;
+            article.className = `chat-message ${isOwnMessage ? 'is-own' : 'is-other'}`;
+            article.dataset.messageId = message.id;
+            article.innerHTML = `
+                <p class="chat-message-body"></p>
+                <span class="chat-message-time">${message.created_at || ''}</span>
+            `;
+
+            const bodyNode = article.querySelector('.chat-message-body');
+            if (bodyNode) {
+                bodyNode.textContent = message.body;
+            }
+
+            chatLog.appendChild(article);
+        };
+
+        const scrollChatToBottom = () => {
+            if (!chatLog) return;
+            chatLog.scrollTop = chatLog.scrollHeight;
+        };
+
+        const isNearBottom = () => {
+            if (!chatLog) return false;
+            return (chatLog.scrollHeight - chatLog.scrollTop - chatLog.clientHeight) < 120;
+        };
+
+        if (conversationList) {
+            conversationList.querySelectorAll('.conversation-item').forEach((button) => {
+                button.addEventListener('click', () => {
+                    const url = button.dataset.url;
+                    if (url) {
+                        window.location.href = url;
+                    }
+                });
+            });
+        }
+
+        if (chatLog) {
+            scrollChatToBottom();
+        }
+
+        if (typeof io !== 'undefined') {
+            const socket = io();
+
+            const joinActiveConversation = () => {
+                if (!selectedConversationId) return;
+                socket.emit('join_conversation', { conversation_id: selectedConversationId });
+            };
+
+            socket.on('connect', joinActiveConversation);
+
+            socket.on('message_created', (message) => {
+                if (Number(message.conversation_id) !== selectedConversationId) return;
+
+                const shouldStick = isNearBottom() || Number(message.sender_id) === currentUserId;
+                appendChatMessage(message);
+                clearChatError();
+
+                if (shouldStick) {
+                    scrollChatToBottom();
+                }
+            });
+
+            socket.on('conversation_updated', (conversation) => {
+                if (!conversationList || !conversation || !conversation.id) return;
+
+                const emptyConversationMessage = conversationList.querySelector('.conversation-empty');
+                if (emptyConversationMessage) {
+                    emptyConversationMessage.remove();
+                }
+
+                let button = conversationList.querySelector(`[data-conversation-id="${conversation.id}"]`);
+                if (!button) {
+                    button = createConversationButton(conversation);
+                } else {
+                    updateConversationButton(button, conversation);
+                }
+
+                button.classList.toggle('active', Number(conversation.id) === selectedConversationId);
+                conversationList.prepend(button);
+            });
+
+            socket.on('conversation_read', (payload) => {
+                if (!conversationList || !payload || !payload.conversation_id) return;
+                const button = conversationList.querySelector(`[data-conversation-id="${payload.conversation_id}"]`);
+                const unreadDot = button ? button.querySelector('[data-unread-dot]') : null;
+                if (unreadDot) {
+                    unreadDot.classList.add('is-hidden');
+                }
+            });
+
+            socket.on('chat_error', (payload) => {
+                showChatError(payload?.message || 'Could not send message.');
+            });
+
+            window.addEventListener('beforeunload', () => {
+                if (selectedConversationId) {
+                    socket.emit('leave_conversation', { conversation_id: selectedConversationId });
+                }
+            });
+
+            if (chatForm && chatInput && selectedConversationId) {
+                chatForm.addEventListener('submit', (event) => {
+                    event.preventDefault();
+                    const body = chatInput.value.trim();
+                    if (!body) {
+                        showChatError('Message cannot be empty.');
+                        return;
+                    }
+
+                    clearChatError();
+                    socket.emit('send_message', {
+                        conversation_id: selectedConversationId,
+                        body,
+                    });
+                    chatInput.value = '';
+                    chatInput.focus();
+                });
+            }
+        }
     }
     
     if (favButtons.length > 0) {
