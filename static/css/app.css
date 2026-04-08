@@ -1195,6 +1195,112 @@ body {
   color: #757575;
 }
 
+/* Estilos modal offer */
+.offer-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+.offer-modal-overlay.active {
+  display: flex;
+}
+
+.offer-modal {
+  background: var(--color-surface, #fff);
+  border-radius: 12px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 420px;
+  margin: 1rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+.offer-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.offer-modal-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.offer-modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--color-text-muted, #888);
+  line-height: 1;
+  padding: 0 0.25rem;
+}
+.offer-modal-close:hover {
+  color: var(--color-text, #222);
+}
+
+.offer-modal-subtitle {
+  margin-bottom: 1.25rem;
+  color: var(--color-text-muted, #555);
+  font-size: 0.95rem;
+}
+
+.offer-input-group {
+  display: flex;
+  align-items: center;
+  border: 1.5px solid var(--color-border, #ddd);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+.offer-input-group:focus-within {
+  border-color: var(--color-primary, #3b82f6);
+}
+
+.offer-input-prefix {
+  padding: 0.75rem 0.75rem;
+  background: var(--color-bg-subtle, #f5f5f5);
+  color: var(--color-text-muted, #888);
+  font-weight: 600;
+  border-right: 1.5px solid var(--color-border, #ddd);
+}
+
+.offer-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 0.75rem;
+  font-size: 1rem;
+  background: transparent;
+  color: var(--color-text, #222);
+}
+
+.offer-hint {
+  font-size: 0.85rem;
+  min-height: 1.2rem;
+  margin-bottom: 1.25rem;
+}
+.offer-hint--error {
+  color: #e53e3e;
+}
+.offer-hint--success {
+  color: #38a169;
+}
+
+.offer-submit-btn {
+  width: 100%;
+}
+.offer-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* Estilos del login */
 .login-page {
   background-color: #002857;
@@ -2720,6 +2826,28 @@ body {
   .conversation-preview {
     font-size: 0.76rem;
   }
+}
+.message-offer {
+  background: var(--color-primary, #3b82f6) !important;
+  color: #fff !important;
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+}
+.message-offer .offer-message-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.8;
+  margin-bottom: 0.25rem;
+}
+.message-offer .offer-message-price {
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+.message-offer .offer-message-sub {
+  font-size: 0.8rem;
+  opacity: 0.75;
+  margin-top: 0.2rem;
 }
 
 /*# sourceMappingURL=app.css.map */

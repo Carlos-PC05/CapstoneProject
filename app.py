@@ -233,7 +233,31 @@ def format_chat_timestamp(value):
     return value.strftime("%Y-%m-%d %H:%M")
 
 
+def format_offer_message_body(price):
+    return f"OFFER::{price:.2f}"
+
+
+def format_offer_preview(body):
+    if not isinstance(body, str) or not body.startswith("OFFER::"):
+        return body
+
+    try:
+        price = float(body.split("::", 1)[1])
+        return f"I have an offer for you: ${price:.2f}"
+    except (IndexError, ValueError):
+        return "Offer"
+
+
 def serialize_message(message, current_user_id):
+    body = message.body
+    preview = body
+    if body.startswith("OFFER::"):
+        try:
+            price = float(body.split("::")[1])
+            preview = f"💰 I have an offer for you: ${price:.2f}"
+        except (IndexError, ValueError):
+            preview = "💰 Offer"
+
     return {
         "id": message.id,
         "conversation_id": message.conversation_id,
@@ -248,7 +272,7 @@ def serialize_message(message, current_user_id):
 def serialize_conversation(conversation, current_user_id):
     other_user = conversation.other_user_for(current_user_id)
     last_message = conversation.last_message
-    preview = (last_message.body or "") if last_message else "No messages yet."
+    preview = format_offer_preview((last_message.body or "") if last_message else "No messages yet.")
     if len(preview) > 70:
         preview = f"{preview[:67]}..."
 
@@ -301,6 +325,8 @@ def create_or_get_conversation(item, buyer_id):
     db.session.commit()
     return conversation
 
+""" Database Seeding """
+
 
 def seed_data():
     if User.query.first():
@@ -323,7 +349,7 @@ def seed_data():
         email="juanperez@gmail.com",
         is_active=True,
         items=[],
-        country="EspaÃ±a",
+        country="España",
         city="Madrid",
         description="Hola, soy Juan.",
         photo_url="",
@@ -335,7 +361,7 @@ def seed_data():
         email="anagomez@gmail.com",
         is_active=True,
         items=[],
-        country="EspaÃ±a",
+        country="España",
         city="Madrid",
         description="Hola, soy Ana.",
         photo_url="",
@@ -951,6 +977,71 @@ def item(item_id):
         item_unavailable=item_status == "deleted" and current_item.user_id != user.id,
     )
 
+""" Hacer oferta """
+
+@app.route("/item/<int:item_id>/offer", methods = ['POST'])
+def make_offer(item_id):
+    user = get_current_user_from_session()
+    if not user:
+        return redirect(url_for("login"))
+    
+    item = Item.query.get_or_404(item_id)
+
+    if item.user_id == user.id:
+        flash("You can not make an offer on your own item", "error")
+        return redirect(url_for("item", item_id=item.id))
+
+    if (item.estado or "").lower() != "active":
+        flash("This item is no longer available", "error")
+        return redirect(url_for("item", item_id=item.id))
+
+    try:
+        offer_price = float(request.form.get("offer_price", 0))
+    except (TypeError, ValueError):
+        flash("Invalid offer price", "error")
+        return redirect(url_for("item", item_id=item.id))
+
+    if offer_price <= 0:
+        flash("The offer must be greater than 0", "error")
+        return redirect(url_for("item", item_id=item.id))
+
+    if offer_price >= item.price:
+        flash("The offer must be lower than the item price.", "error")
+        return redirect(url_for("item", item_id=item.id))
+
+    conversation = create_or_get_conversation(item, user.id)
+    created_at = datetime.now()
+
+    offer_body = format_offer_message_body(offer_price)
+
+    message = Message(
+        conversation_id=conversation.id,
+        sender_id=user.id,
+        body=offer_body,
+        created_at=created_at,
+    )
+    db.session.add(message)
+    conversation.last_message_at = created_at
+    conversation.mark_read_for(user.id)
+    db.session.commit()
+
+    socketio.emit(
+        "message_created",
+        serialize_message(message, user.id),
+        to=f"conversation:{conversation.id}",
+    )
+    socketio.emit(
+        "conversation_updated",
+        serialize_conversation(conversation, conversation.buyer_id),
+        to=f"user:{conversation.buyer_id}"
+    )
+    socketio.emit(
+        "conversation_updated",
+        serialize_conversation(conversation, conversation.seller_id),
+        to=f"user:{conversation.seller_id}",
+    )
+    
+    return redirect(url_for("messages", conversation_id=conversation.id))
 
 """ Socket.IO """
 
@@ -1017,7 +1108,7 @@ def handle_send_message(data):
         emit("chat_error", {"message": "Message cannot exceed 1000 characters."})
         return
 
-    created_at = datetime.utcnow()
+    created_at = datetime.now()
     message = Message(
         conversation_id=conversation.id,
         sender_id=user.id,
@@ -1044,7 +1135,6 @@ def handle_send_message(data):
         serialize_conversation(conversation, conversation.seller_id),
         to=f"user:{conversation.seller_id}",
     )
-
 
 if __name__ == "__main__":
     with app.app_context():
