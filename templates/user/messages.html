@@ -37,7 +37,6 @@
                             <span class="conversation-item-name">{{ conversation.item_name }}</span>
                             <span class="conversation-preview-row">
                                 <span class="conversation-preview" data-last-preview>{{ conversation.last_message_preview }}</span>
-                                <span class="conversation-unread{% if not conversation.is_unread %} is-hidden{% endif %}" data-unread-dot></span>
                             </span>
                         </span>
                     </button>
@@ -72,7 +71,18 @@
                 {% if selected_messages %}
                     {% for message in selected_messages %}
                         <article class="chat-message {% if message.is_own %}is-own{% else %}is-other{% endif %}" data-message-id="{{ message.id }}">
-                            <p class="chat-message-body">{{ message.body }}</p>
+                            {% if message.body.startswith('OFFER::') %}
+                                {% set offer_price = message.body.split('::')[1] %}
+                                <div class="chat-message-body">
+                                    <div class="message-offer">
+                                        <p class="offer-message-label">💰 Offer</p>
+                                        <p class="offer-message-price">${{ "%.2f"|format(offer_price|float) }}</p>
+                                        <p class="offer-message-sub">This user has made you an offer</p>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <p class="chat-message-body">{{ message.body }}</p>
+                            {% endif %}
                             <span class="chat-message-time">{{ message.created_at }}</span>
                         </article>
                     {% endfor %}

@@ -134,7 +134,16 @@
                             <span class="btn btn-outline">Purchased</span>
                         {% endif %}
                         {% if item.estado|lower != 'deleted' %}
-                            <a class="btn btn-outline">Make an offer</a>
+                            <button
+                                type="button"
+                                id="open-offer-modal"
+                                class="btn btn-outline btn-offer"
+                                data-item-price="{{ item.price }}"
+                                aria-controls="offer-modal"
+                                aria-haspopup="dialog"
+                            >
+                                Make an offer
+                            </button>
                             <a href="{{ url_for('start_item_conversation', item_id=item.id) }}" class="btn btn-outline">Send a message</a>
                             <a class="btn btn-outline favorite-btn {% if item.id in favorite_item_ids %}active{% endif %}" data-item-id="{{ item.id }}" data-is-favorite="{% if item.id in favorite_item_ids %}true{% else %}false{% endif %}" data-favorite-text="true">
                                 {% if item.id in favorite_item_ids %}Remove from favorites{% else %}Add to favorites{% endif %}
@@ -159,4 +168,39 @@
             </div>
         </aside>
     </div>
+
+    <!-- Modal Make an offer -->
+    <div class="offer-modal-overlay" id="offer-modal" onclick="if(event.target===this) this.classList.remove('active')">
+        <div class="offer-modal">
+            <div class="offer-modal-header">
+                <h2 class="offer-modal-title">Make an offer</h2>
+                <button class="offer-modal-close" onclick="document.getElementById('offer-modal').classList.remove('active')">&times;</button>
+            </div>
+
+            <div class="offer-modal-body">
+                <p class="offer-modal-subtitle">Listed price: <strong>${{ item.price }}</strong></p>
+
+                <form action="{{ url_for('make_offer', item_id=item.id) }}" method="post" id="offer-form">
+                    <div class="offer-input-group">
+                        <span class="offer-input-prefix">$</span>
+                        <input
+                            type="number"
+                            name="offer_price"
+                            id="offer_price"
+                            class="offer-input"
+                            placeholder="Your offer"
+                            min="0.01"
+                            max="{{ item.price - 0.01 }}"
+                            step="0.01"
+                            required
+                            autofocus
+                        >
+                    </div>
+                    <p class="offer-hint" id="offer-hint"></p>
+                    <button type="submit" class="btn btn-primary offer-submit-btn" id="offer-submit">Send offer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
 {% endblock %}

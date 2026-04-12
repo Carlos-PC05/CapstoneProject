@@ -234,6 +234,7 @@ body {
 
     @include m.desktop {
         flex-direction: row; // Solo en desktop: lado a lado
+        align-items: flex-start;
     }
 }
 
@@ -337,13 +338,13 @@ body {
     .sidebar {
         width: 200px; // Reducido de 250px
         height: calc(100vh - 80px); /* Altura fija para el sticky */
-        min-height: calc(100vh - 80px); 
+        //min-height: calc(100vh - 80px); 
         border-bottom: none;
         border-right: 1px solid #f0f0f0; // Borde sutil
         padding: 2rem 1.5rem;
         position: sticky; /* Fijo al hacer scroll */
         top: 80px; /* Debajo del navbar */
-        overflow-y: auto; 
+        overflow-y: hidden; 
         background-color: #ffffff;
 
         // Mostrar header minimalista

@@ -426,7 +426,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     <span class="conversation-item-name">${conversation.item_name}</span>
                     <span class="conversation-preview-row">
                         <span class="conversation-preview" data-last-preview>${conversation.last_message_preview || ''}</span>
-                        <span class="conversation-unread${conversation.is_unread ? '' : ' is-hidden'}" data-unread-dot></span>
                     </span>
                 </span>
             `;
@@ -443,7 +442,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const nameNode = button.querySelector('.conversation-name');
             const timeNode = button.querySelector('[data-last-time]');
             const previewNode = button.querySelector('[data-last-preview]');
-            const unreadDot = button.querySelector('[data-unread-dot]');
             const itemNameNode = button.querySelector('.conversation-item-name');
             const avatarNode = button.querySelector('.conversation-avatar');
 
@@ -456,11 +454,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 avatarNode.innerHTML = conversation.other_user_photo_url
                     ? `<img src="${conversation.other_user_photo_url}" alt="${conversation.other_user_name}">`
                     : conversation.other_user_name.charAt(0).toUpperCase();
-            }
-
-            if (unreadDot) {
-                const shouldHide = Number(conversation.id) === selectedConversationId ? true : !conversation.is_unread;
-                unreadDot.classList.toggle('is-hidden', shouldHide);
             }
         };
 
@@ -484,7 +477,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const bodyNode = article.querySelector('.chat-message-body');
             if (bodyNode) {
-                bodyNode.textContent = message.body;
+                const rendered = renderMessageBody(message.body);
+                if (message.body.startsWith('OFFER::')) {
+                    bodyNode.innerHTML = rendered;  // HTML para ofertas
+                } else {
+                    bodyNode.textContent = rendered;  // texto plano para mensajes normales (seguro)
+                }
             }
 
             chatLog.appendChild(article);
@@ -514,6 +512,18 @@ document.addEventListener('DOMContentLoaded', function() {
         if (chatLog) {
             scrollChatToBottom();
         }
+
+        const renderMessageBody = (body) => {
+            if (typeof body === 'string' && body.startsWith('OFFER::')) {
+                const price = parseFloat(body.split('::')[1]).toFixed(2);
+                return `<div class="message-offer">
+                    <p class="offer-message-label">💰 Offer</p>
+                    <p class="offer-message-price">$${price}</p>
+                    <p class="offer-message-sub">This user has made you an offer</p>
+                </div>`;
+            }
+            return body.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        };
 
         if (typeof io !== 'undefined') {
             const socket = io();
@@ -554,15 +564,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 button.classList.toggle('active', Number(conversation.id) === selectedConversationId);
                 conversationList.prepend(button);
-            });
-
-            socket.on('conversation_read', (payload) => {
-                if (!conversationList || !payload || !payload.conversation_id) return;
-                const button = conversationList.querySelector(`[data-conversation-id="${payload.conversation_id}"]`);
-                const unreadDot = button ? button.querySelector('[data-unread-dot]') : null;
-                if (unreadDot) {
-                    unreadDot.classList.add('is-hidden');
-                }
             });
 
             socket.on('chat_error', (payload) => {
@@ -744,6 +745,81 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     /* Fin de la lógica de filtros */
+
+    /* Oferta */
+    const btnOffer = document.getElementById('open-offer-modal');
+    const offerModal = document.getElementById('offer-modal');
+
+    if (btnOffer && offerModal) {
+        const offerForm = document.getElementById('offer-form');
+        const offerInput = document.getElementById('offer_price');
+        const offerHint = document.getElementById('offer-hint');
+        const offerSubmit = document.getElementById('offer-submit');
+        const listedPrice = parseFloat(btnOffer.dataset.itemPrice);
+
+        const closeOfferModal = () => {
+            offerModal.classList.remove('active');
+        };
+
+        const validateOffer = () => {
+            if (!offerInput || !offerHint || !offerSubmit) return false;
+
+            const value = offerInput.value.trim();
+            const offerValue = parseFloat(value);
+
+            if (!value || Number.isNaN(offerValue) || offerValue <= 0) {
+                offerHint.textContent = '';
+                offerHint.className = 'offer-hint';
+                offerSubmit.disabled = true;
+                return false;
+            }
+
+            if (offerValue >= listedPrice) {
+                offerHint.textContent = 'Your offer must be lower than the listed price.';
+                offerHint.className = 'offer-hint offer-hint--error';
+                offerSubmit.disabled = true;
+                return false;
+            }
+
+            const savings = (listedPrice - offerValue).toFixed(2);
+            offerHint.textContent = `That's $${savings} off the listed price.`;
+            offerHint.className = 'offer-hint offer-hint--success';
+            offerSubmit.disabled = false;
+            return true;
+        };
+
+        btnOffer.addEventListener('click', function () {
+            offerModal.classList.add('active');
+            if (offerInput) {
+                offerInput.focus();
+                offerInput.select();
+            }
+            validateOffer();
+        });
+
+        if (offerInput) {
+            offerInput.addEventListener('input', validateOffer);
+        }
+
+        if (offerForm) {
+            offerForm.addEventListener('submit', function (event) {
+                if (!validateOffer()) {
+                    event.preventDefault();
+                }
+            });
+        }
+
+        if (offerSubmit) {
+            offerSubmit.disabled = true;
+        }
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                closeOfferModal();
+            }
+        });
+    }
+    /* Fin oferta */
 
     /* Fin del archivo JS */
 });
