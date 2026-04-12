@@ -607,6 +607,7 @@ body {
 @media (min-width: 1024px) {
   .layout-container {
     flex-direction: row;
+    align-items: flex-start;
   }
 }
 
@@ -693,13 +694,12 @@ body {
   .sidebar {
     width: 200px;
     height: calc(100vh - 80px); /* Altura fija para el sticky */
-    min-height: calc(100vh - 80px);
     border-bottom: none;
     border-right: 1px solid #f0f0f0;
     padding: 2rem 1.5rem;
     position: sticky; /* Fijo al hacer scroll */
     top: 80px; /* Debajo del navbar */
-    overflow-y: auto;
+    overflow-y: hidden;
     background-color: #ffffff;
   }
   .sidebar .sidebar-header {
@@ -2827,24 +2827,27 @@ body {
     font-size: 0.76rem;
   }
 }
-.message-offer {
+.chat-message-body {
+  max-width: 10rem;
+}
+.chat-message-body .message-offer {
   background: var(--color-primary, #3b82f6) !important;
-  color: #fff !important;
+  color: #e0e0e0 !important;
   border-radius: 12px;
   padding: 0.85rem 1rem;
 }
-.message-offer .offer-message-label {
+.chat-message-body .message-offer .offer-message-label {
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   opacity: 0.8;
   margin-bottom: 0.25rem;
 }
-.message-offer .offer-message-price {
+.chat-message-body .message-offer .offer-message-price {
   font-size: 1.4rem;
   font-weight: 700;
 }
-.message-offer .offer-message-sub {
+.chat-message-body .message-offer .offer-message-sub {
   font-size: 0.8rem;
   opacity: 0.75;
   margin-top: 0.2rem;

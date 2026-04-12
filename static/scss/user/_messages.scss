@@ -449,28 +449,32 @@
 }
 
 // ── Offer message bubble (en el chat) ───────────────────────
-.message-offer {
-    background: var(--color-primary, #3b82f6) !important;
-    color: #fff !important;
-    border-radius: 12px;
-    padding: 0.85rem 1rem;
+.chat-message-body {
+    max-width: 10rem;
+    
+    .message-offer {
+        background: var(--color-primary, #3b82f6) !important;
+        color: v.$blanco !important;
+        border-radius: 12px;
+        padding: 0.85rem 1rem;
 
-    .offer-message-label {
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        opacity: 0.8;
-        margin-bottom: 0.25rem;
-    }
+        .offer-message-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            opacity: 0.8;
+            margin-bottom: 0.25rem;
+        }
 
-    .offer-message-price {
-        font-size: 1.4rem;
-        font-weight: 700;
-    }
+        .offer-message-price {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
 
-    .offer-message-sub {
-        font-size: 0.8rem;
-        opacity: 0.75;
-        margin-top: 0.2rem;
+        .offer-message-sub {
+            font-size: 0.8rem;
+            opacity: 0.75;
+            margin-top: 0.2rem;
+        }
     }
 }
