@@ -337,8 +337,8 @@ def seed_data():
         email="carlosparracamacho@gmail.com",
         is_active=True,
         items=[],
-        country="EspaÃ±a",
-        city="HuÃ©rcal-Overa",
+        country="España",
+        city="Huércal-Overa",
         description="Hola, soy Carlos.",
         photo_url="img/users/fotoNYSkyline.jpeg",
     )
@@ -371,10 +371,10 @@ def seed_data():
     db.session.add_all([user1, user2, user3])
     db.session.commit()
 
-    item1 = Item(name="Taza", description="Taza de ceramica", brand="", condition="good", price=10.0, category="furniture", images=[], user_id=user1.id)
-    item2 = Item(name="Lampara", description="Lampara LED", brand="Philips", condition="good", price=20.0, category="furniture", images=[], user_id=user2.id)
-    item3 = Item(name="Mesa", description="Mesa de madera", brand="Ikea", condition="fair", price=30.0, category="furniture", images=[], user_id=user3.id)
-    item4 = Item(name="Silla", description="Silla de plÃ¡stico", brand="", condition="good", price=40.0, category="furniture", images=[], user_id=user1.id)
+    item1 = Item(name="Mug", description="Ceramic mug", brand="", condition="good", price=10.0, category="furniture", images=[], user_id=user1.id)
+    item2 = Item(name="Lamp", description="LED lamp", brand="Philips", condition="good", price=20.0, category="furniture", images=[], user_id=user2.id)
+    item3 = Item(name="Table", description="Wooden table", brand="Ikea", condition="fair", price=30.0, category="furniture", images=[], user_id=user3.id)
+    item4 = Item(name="Chair", description="Plastic chair", brand="", condition="good", price=40.0, category="furniture", images=[], user_id=user1.id)
     item5 = Item(name="Tennis Racket", description="Used tennis racket in good condition", brand="Wilson", condition="good", price=15.0, category="sport", images=[], user_id=user2.id)
     item6 = Item(name="Padel Racket", description="Brand new padel racket, never used", brand="Bullpadel", condition="new", price=100.0, category="sport", images=[], user_id=user3.id)
     item7 = Item(name="Pillow Set", description="Set of 2 comfortable pillows", brand="", condition="like-new", price=25.0, category="bedding", images=[], user_id=user1.id)
