@@ -132,7 +132,7 @@ Then open your browser at `http://localhost:5000`.
 
 ### Demo
 
-[![CapstoneProjectDemo]([https://img.youtube.com/vi/ID_DE_TU_VIDEO/0.jpg])]
+[![Demo](https://img.youtube.com/vi/hpbHz_Mz0PA/maxresdefault.jpg)](https://youtu.be/hpbHz_Mz0PA)
 
 ---
 
