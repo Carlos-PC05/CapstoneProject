@@ -44,7 +44,7 @@
             {% if item.owner.id != session['user_id'] %}
                 <div class="divider"></div>
                 <div class="items-similares">
-                    <h3 class="sitems-title">Articulos similares</h3>
+                    <h3 class="sitems-title">Similar Items</h3>
                     <div class="contenedor">
                         {% for similar_item in similar_items %}
                             {% if similar_item.owner.id != session['user_id'] and similar_item.estado == 'active' %}
