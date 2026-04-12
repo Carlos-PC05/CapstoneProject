@@ -1,3 +1,5 @@
+
+
 # 🛒 DeSales Exchange Hub — University Marketplace
 
 A web application built with **Flask** that allows university students to buy, sell, and exchange second-hand items within their academic community.
@@ -130,7 +132,7 @@ Then open your browser at `http://localhost:5000`.
 
 ### Demo
 
-(Video)
+[![CapstoneProjectDemo]([https://img.youtube.com/vi/ID_DE_TU_VIDEO/0.jpg])]
 
 ---
 
